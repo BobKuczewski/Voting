@@ -1,13 +1,8 @@
 <html>
 
-
-
 <head>
-
 <title>Voting Methods Exploration</title>
-
 </head>
-
 
 
 <script>
@@ -179,40 +174,22 @@ function calc_results() {
 function change_methods() {
 }
 
-
 </script>
 
 
-
 <body bgcolor="lightblue" onload="load()">
-
-
-
 <center>
-
-
-
 <h2>Voting Methods Exploration</h2>
 
 <hr/>
-
-
-
 <h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
 Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
-
-
-
 <p/>
 
-
-
 <table width="100%">
-
 <tr>
 
 <td width="50%" valign="top">
-
 <textarea width="100%" id="ballots" rows="12" cols="40">
 [a c d b]
 [c a d b]
@@ -223,11 +200,9 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 [a c b d]
 [b d]
 </textarea>
-
 </td>
 
 <td width="50%" valign="top">
-
 <ul>
 <li>Each ballot is enclosed in a set of square brackets.</li>
 <li>Choices are listed in the brackets separated by spaces.</li>
@@ -238,17 +213,12 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <li>Numeric values are expressed inside parentheses.<br/>
       Ballot with numeric values: [ b(100) d(70) a(70) c(10) ]</li>
 </ul>
-
 </td>
 
 </tr>
-
 </table>
 
-
-
 <p/>
-
 
 <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
@@ -256,25 +226,13 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <option value="condorcet_mode">Condorcet</option>
 </select>
 
-
 <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
 
-
-
 <hr/>
-
-
-
 </center>
-
-
 
 <div id="results"></div>
 
-
-
 </body>
-
-
 
 </html>
