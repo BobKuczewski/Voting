@@ -1,11 +1,35 @@
 <html>
 
+
+
 <head>
+
 <title>Voting Methods</title>
+
 </head>
+
+
 
 <script>
 function load() {
+}
+
+function get_cand_list ( ballot_text ) {
+	bt = ballot_text;
+	bt = bt.replaceAll ( '[', ' ' );
+	bt = bt.replaceAll ( ']', ' ' );
+	bt = bt.replaceAll ( '\n', ' ' );
+	while (bt.indexOf('  ') >= 0) {
+    bt = bt.replaceAll ( '  ', ' ' );
+  }
+  cand_set = new Set ( bt );
+  cand_set.delete ( ' ' );
+  cand_list = []
+	for (const i of cand_set) {
+	  cand_list.push ( i );
+	}
+	cand_list.sort();
+	return ( cand_list );
 }
 
 function get_ballot_list ( ballot_text ) {
@@ -38,7 +62,8 @@ function get_ballot_list ( ballot_text ) {
   return ( ballot_list );
 }
 
-function simple_plurality ( cand_list, ballots ) {
+function simple_plurality ( cand_list, ballot_text ) {
+  ballots = get_ballot_list ( ballot_text );
   machine = {};
   for (i=0; i<cand_list.length; i++) {
     machine[cand_list[i]] = 0;
@@ -46,7 +71,7 @@ function simple_plurality ( cand_list, ballots ) {
   for (i=0; i<ballots.length; i++) {
     machine[ballots[i][0]] += 1;
   }
-  result = "<b><u>Simple Plurality</u>:</b><br/>";
+  result = "<b><u>Simple Plurality</u>:</b><br/>\n";
   for (i=0; i<cand_list.length; i++) {
     result += "Candidate <b>" + cand_list[i] 
             + "</b> got " + machine[cand_list[i]]
@@ -77,84 +102,144 @@ function simple_plurality ( cand_list, ballots ) {
   return ( result );
 }
 
-function instant_runoff ( cand_list, ballots ) {
-  return ( "Instant Runoff is not implemented yet." );
+function instant_runoff ( cand_list, ballot_text ) {
+  result = "<b><u>Instant Runoff</u>:</b><br/>\n";
+
+  ballots = get_ballot_list ( ballot_text );
+  winners = [];
+
+  highest_candidates = []
+  lowest_candidates = []
+  while (winners.length <= 0) {
+    machine = {};
+    for (i=0; i<cand_list.length; i++) {
+      machine[cand_list[i]] = 0;
+    }
+    for (i=0; i<ballots.length; i++) {
+      machine[ballots[i][0]] += 1;
+    }
+    highest_votes = -1;
+    highest_candidates = []
+    lowest_votes = ballots.length + 2;
+    lowest_candidates = []
+    for (i=0; i<cand_list.length; i++) {
+      if (machine[cand_list[i]] < lowest_votes) {
+        lowest_votes = machine[cand_list[i]];
+      }
+      if (machine[cand_list[i]] > highest_votes) {
+        highest_votes = machine[cand_list[i]];
+      }
+    }
+    for (i=0; i<cand_list.length; i++) {
+      if (machine[cand_list[i]] == lowest_votes) {
+        lowest_candidates.push ( cand_list[i] );
+      }
+      if (machine[cand_list[i]] == highest_votes) {
+        highest_candidates.push ( cand_list[i] );
+      }
+    }
+    result = result + "Ballots: " + ballots + "<br/>\n" ;
+    result = result + "Lowest: " + lowest_candidates + "<br/>\n" ;
+    result = result + "Highest: " + highest_candidates + "<br/>\n" ;
+    winners = highest_candidates;
+  }
+  result = result + "Instant Runoff is not implemented yet."
+  return ( result );
 }
 
-function condorcet ( cand_list, ballots ) {
+function condorcet ( cand_list, ballot_text ) {
+  ballots = get_ballot_list ( ballot_text );
   return ( "Condorcet is not implemented yet." );
 }
 
+
 function calc_results() {
+
 	ballot_area = document.getElementById ( "ballots" );
+
 	result_area = document.getElementById ( "results" );
 	ballot_text = ballot_area.value;
-	
-	bt = ballot_text;
-	bt = bt.replaceAll ( '[', ' ' );
-	bt = bt.replaceAll ( ']', ' ' );
-	bt = bt.replaceAll ( '\n', ' ' );
-	while (bt.indexOf('  ') >= 0) {
-  	bt = bt.replaceAll ( '  ', ' ' );
-  }
 
-  cand_set = new Set ( bt );
-  cand_set.delete ( ' ' );
-  cand_list = []
-	for (const i of cand_set) {
-	  cand_list.push ( i );
-	}
-	cand_list.sort();
+  cand_list = get_cand_list ( ballot_text );
 
-  ballot_list = get_ballot_list ( ballot_text );
-	
-	// result_area.innerHTML = "<p>Candidates: &nbsp; " + cand_list + "</p>";
 	if (document.getElementById("mode").value == "plurality_mode") {
-	  results = simple_plurality ( cand_list, ballot_list );
+	  results = simple_plurality ( cand_list, ballot_text );
 	} else if (document.getElementById("mode").value == "instant_runoff_mode") {
-	  results = instant_runoff ( cand_list, ballot_list );
+	  results = instant_runoff ( cand_list, ballot_text );
 	} else if (document.getElementById("mode").value == "condorcet_mode") {
-	  results = condorcet ( cand_list, ballot_list );
+	  results = condorcet ( cand_list, ballot_text );
 	} else {
 	  results = "Mode not recognized.";
 	}
+
 	result_area.innerHTML = "<p>" + results + "</p>";
+
 }
 
 function change_methods() {
 }
 
+
 </script>
+
+
 
 <body bgcolor="lightblue" onload="load()">
 
+
+
 <center>
 
+
+
 <h2>Voting Methods</h2>
+
 <hr/>
+
+
 
 <h3>Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 
+
+
 <p/>
 
+
+
 <table width="100%">
+
 <tr>
+
 <td width="100%" valign="top">
+
 <textarea width="100%" id="ballots" rows="10" cols="40">
+
 [a c d b]
+
 [c a d b]
+
 [b]
+
 [c d b]
 [b c d]
 [d b a]
+
 [a c b d]
+
 [b d]
+
 </textarea>
+
 </td>
+
 </tr>
+
 </table>
 
+
+
 <p/>
+
 
 <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
@@ -162,14 +247,25 @@ function change_methods() {
 <option value="condorcet_mode">Condorcet</option>
 </select>
 
+
 <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
+
+
 
 <hr/>
 
+
+
 </center>
+
+
 
 <div id="results"></div>
 
+
+
 </body>
+
+
 
 </html>
