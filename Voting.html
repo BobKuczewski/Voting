@@ -77,6 +77,14 @@ function simple_plurality ( cand_list, ballots ) {
   return ( result );
 }
 
+function instant_runoff ( cand_list, ballots ) {
+  return ( "Instant Runoff is not implemented yet." );
+}
+
+function condorcet ( cand_list, ballots ) {
+  return ( "Condorcet is not implemented yet." );
+}
+
 function calc_results() {
 	ballot_area = document.getElementById ( "ballots" );
 	result_area = document.getElementById ( "results" );
@@ -101,9 +109,21 @@ function calc_results() {
   ballot_list = get_ballot_list ( ballot_text );
 	
 	// result_area.innerHTML = "<p>Candidates: &nbsp; " + cand_list + "</p>";
-	results = simple_plurality ( cand_list, ballot_list )
+	if (document.getElementById("mode").value == "plurality_mode") {
+	  results = simple_plurality ( cand_list, ballot_list );
+	} else if (document.getElementById("mode").value == "instant_runoff_mode") {
+	  results = instant_runoff ( cand_list, ballot_list );
+	} else if (document.getElementById("mode").value == "condorcet_mode") {
+	  results = condorcet ( cand_list, ballot_list );
+	} else {
+	  results = "Mode not recognized.";
+	}
 	result_area.innerHTML = "<p>" + results + "</p>";
 }
+
+function change_methods() {
+}
+
 </script>
 
 <body bgcolor="lightblue" onload="load()">
@@ -135,6 +155,12 @@ function calc_results() {
 </table>
 
 <p/>
+
+<select id="mode" onchange="change_methods()">
+<option value="plurality_mode">Simple Plurality</option>
+<option value="instant_runoff_mode">Instant Runoff</option>
+<option value="condorcet_mode">Condorcet</option>
+</select>
 
 <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
 
