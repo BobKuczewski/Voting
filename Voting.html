@@ -5,14 +5,108 @@
 </head>
 
 <script>
+function load() {
+}
+
+function get_ballot_list ( ballot_text ) {
+  bt = ballot_text;
+	bt = bt.replaceAll ( '\n', ' ' );
+	bt = bt.replaceAll ( ']', ' ' );
+	while (bt.indexOf('  ') >= 0) {
+  	bt = bt.replaceAll ( '  ', ' ' );
+  }
+	bt = bt.replaceAll ( ' [', '[' );
+	bt = bt.replaceAll ( '[ ', '[' );
+  bt = bt.trim();
+  bl = bt.split('[');
+  bll = bl.length;
+
+  ballot_list = [];
+  for (i=0; i<bll; i++) {
+    bs = bl[i].trim();
+    if (bs.length > 0) {
+      ballot = [];
+      bcs = bs.split(' ');
+      for (j=0; j<bcs.length; j++) {
+        if (bcs[j].trim().length > 0) {
+          ballot.push ( bcs[j].trim() );
+        }
+      }
+      ballot_list.push ( ballot );
+    }
+  }
+  return ( ballot_list );
+}
+
+function simple_plurality ( cand_list, ballots ) {
+  machine = {};
+  for (i=0; i<cand_list.length; i++) {
+    machine[cand_list[i]] = 0;
+  }
+  for (i=0; i<ballots.length; i++) {
+    machine[ballots[i][0]] += 1;
+  }
+  result = "<b><u>Simple Plurality</u>:</b><br/>";
+  for (i=0; i<cand_list.length; i++) {
+    result += "Candidate <b>" + cand_list[i] 
+            + "</b> got " + machine[cand_list[i]]
+            + " first place votes<br/>\n";
+  }
+  highest_votes = -1;
+  highest_candidates = []
+  for (i=0; i<cand_list.length; i++) {
+    if (machine[cand_list[i]] > highest_votes) {
+      highest_votes = machine[cand_list[i]];
+    }
+  }
+  for (i=0; i<cand_list.length; i++) {
+    if (machine[cand_list[i]] == highest_votes) {
+      highest_candidates.push ( cand_list[i] );
+    }
+  }
+  if (highest_candidates.length == 1) {
+    result = result + "Candidate <b>" + highest_candidates[0] + "</b> won!";
+  } else if (highest_candidates.length > 1) {
+    for (i=0; i<highest_candidates.length; i++) {
+      result = result + "Candidate <b>" + highest_candidates[i] + "</b> tied for the win.<br/>";
+    }
+  } else {
+    result = result + "No Candidates Found.";
+  }
+    
+  return ( result );
+}
+
 function calc_results() {
-	var ballot_area = document.getElementById ( "ballots" );
-	var result_area = document.getElementById ( "results" );
-	output_area.innerHTML = input_area.value;
+	ballot_area = document.getElementById ( "ballots" );
+	result_area = document.getElementById ( "results" );
+	ballot_text = ballot_area.value;
+	
+	bt = ballot_text;
+	bt = bt.replaceAll ( '[', ' ' );
+	bt = bt.replaceAll ( ']', ' ' );
+	bt = bt.replaceAll ( '\n', ' ' );
+	while (bt.indexOf('  ') >= 0) {
+  	bt = bt.replaceAll ( '  ', ' ' );
+  }
+
+  cand_set = new Set ( bt );
+  cand_set.delete ( ' ' );
+  cand_list = []
+	for (const i of cand_set) {
+	  cand_list.push ( i );
+	}
+	cand_list.sort();
+
+  ballot_list = get_ballot_list ( ballot_text );
+	
+	// result_area.innerHTML = "<p>Candidates: &nbsp; " + cand_list + "</p>";
+	results = simple_plurality ( cand_list, ballot_list )
+	result_area.innerHTML = "<p>" + results + "</p>";
 }
 </script>
 
-<body bgcolor="lightblue" onload="update_text()">
+<body bgcolor="lightblue" onload="load()">
 
 <center>
 
@@ -25,12 +119,14 @@ function calc_results() {
 
 <table width="100%">
 <tr>
-<td width="90%" valign="top">
-<textarea width="100%" id="ballots" rows="10" cols="80">
+<td width="100%" valign="top">
+<textarea width="100%" id="ballots" rows="10" cols="40">
 [a c d b]
 [c a d b]
 [b]
 [c d b]
+[b c d]
+[d b a]
 [a c b d]
 [b d]
 </textarea>
