@@ -4,7 +4,7 @@
 
 <head>
 
-<title>Voting Methods</title>
+<title>Voting Methods Exploration</title>
 
 </head>
 
@@ -71,11 +71,11 @@ function simple_plurality ( cand_list, ballot_text ) {
   for (i=0; i<ballots.length; i++) {
     machine[ballots[i][0]] += 1;
   }
-  result = "<b><u>Simple Plurality</u>:</b><br/>\n";
+  result = "<b>Simple Plurality &nbsp; </b> (only the first choice matters):<br/>\n";
   for (i=0; i<cand_list.length; i++) {
     result += "Candidate <b>" + cand_list[i] 
             + "</b> got " + machine[cand_list[i]]
-            + " first place votes<br/>\n";
+            + " first choice votes<br/>\n";
   }
   highest_votes = -1;
   highest_candidates = []
@@ -192,13 +192,14 @@ function change_methods() {
 
 
 
-<h2>Voting Methods</h2>
+<h2>Voting Methods Exploration</h2>
 
 <hr/>
 
 
 
-<h3>Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
+<h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
+Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 
 
 
@@ -210,25 +211,33 @@ function change_methods() {
 
 <tr>
 
-<td width="100%" valign="top">
+<td width="50%" valign="top">
 
-<textarea width="100%" id="ballots" rows="10" cols="40">
-
+<textarea width="100%" id="ballots" rows="12" cols="40">
 [a c d b]
-
 [c a d b]
-
 [b]
-
 [c d b]
 [b c d]
 [d b a]
-
 [a c b d]
-
 [b d]
-
 </textarea>
+
+</td>
+
+<td width="50%" valign="top">
+
+<ul>
+<li>Each ballot is enclosed in a set of square brackets.</li>
+<li>Choices are listed in the brackets separated by spaces.</li>
+<li>The first choice is listed first (on the left).<br/>
+      Simple example ballot: [ b d a c ]</li>
+<li>Equal choices are expressed with "=".<br/>
+      Ballot with equal choices: [ b d=a c ]</li>
+<li>Numeric values are expressed inside parentheses.<br/>
+      Ballot with numeric values: [ b(100) d(70) a(70) c(10) ]</li>
+</ul>
 
 </td>
 
