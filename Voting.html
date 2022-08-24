@@ -1,209 +1,560 @@
 <html>
 
+
 <head>
+
 <title>Voting Methods Exploration</title>
+
 </head>
 
 
+
+
 <script>
-function load() {
+/* Represent a ballot:
+     Simple example ballot: [ b d a c f e ]
+     Ballot with equal choices: [ b d=a c=f e ]
+     Ballot with numeric values: [ b(100) d(70) a(70) c(10) f(10) e(1) ]
+
+   In order to represent equal values (and support range voting):
+     All choices will have a numeric value.
+*/
+
+class Choice {
+  constructor(name,value=null) {
+    this.cand_name = name;
+    this.value = value;
+    this.rank = null;  // The rank provides the ordering. Multiple candidates may share the same rank.
+  }
 }
 
-function get_cand_list ( ballot_text ) {
-	bt = ballot_text;
-	bt = bt.replaceAll ( '[', ' ' );
-	bt = bt.replaceAll ( ']', ' ' );
-	bt = bt.replaceAll ( '\n', ' ' );
-	while (bt.indexOf('  ') >= 0) {
-    bt = bt.replaceAll ( '  ', ' ' );
-  }
-  cand_set = new Set ( bt );
-  cand_set.delete ( ' ' );
-  cand_list = []
-	for (const i of cand_set) {
-	  cand_list.push ( i );
-	}
-	cand_list.sort();
-	return ( cand_list );
-}
+class Ballot {
 
-function get_ballot_list ( ballot_text ) {
-  bt = ballot_text;
-	bt = bt.replaceAll ( '\n', ' ' );
-	bt = bt.replaceAll ( ']', ' ' );
-	while (bt.indexOf('  ') >= 0) {
-  	bt = bt.replaceAll ( '  ', ' ' );
+  constructor(s=null) {
+    this.next_rank = 0;
+    this.s = s;
+    this.choices = [];
   }
-	bt = bt.replaceAll ( ' [', '[' );
-	bt = bt.replaceAll ( '[ ', '[' );
-  bt = bt.trim();
-  bl = bt.split('[');
-  bll = bl.length;
 
-  ballot_list = [];
-  for (i=0; i<bll; i++) {
-    bs = bl[i].trim();
-    if (bs.length > 0) {
-      ballot = [];
-      bcs = bs.split(' ');
-      for (j=0; j<bcs.length; j++) {
-        if (bcs[j].trim().length > 0) {
-          ballot.push ( bcs[j].trim() );
+  add(name, value=null) {
+    // Add the name to the ballot with optional value (unless already listed)
+
+    // First ensure that the name isn't already on the ballot earlier
+    let found = false;
+    for (let i=0; i<this.choices.length; i++) {
+      if (this.choices[i].cand_name == name) {
+        found = true;
+        console.log ( "Warning: Candidate " + name + " is already on the ballot." );
+        break;
+      }
+    }
+    if (!found) {
+      // Add the name to the ballot
+      let choice = new Choice ( name, value );
+      // Adjust the ranks as needed
+      /*
+      if (value == null) {
+        // Just use the next rank and decrement
+        choice.rank = this.next_rank;
+        this.next_rank = this.next_rank - 1;
+      } else {
+        // Assign the requested value to this choice
+        choice.rank = value;
+        this.next_rank = value - 1;
+        // Adjust the values as needed to be consistent
+        this.adjust_lowest_to ( value );
+      }
+      */
+      this.choices.push ( choice );
+      this.adjust_ranks();
+    }
+  }
+
+  adjust_ranks() {
+    // Generate consistent rank numbers within a single ballot
+    // Start by assessing the ballot and assigning ranks based on values
+    let has_nulls = false;
+    let has_values = false;
+    for (let i=0; i<this.choices.length; i++) {
+      if (this.choices[i].value == null) {
+        has_nulls = true;
+      } else {
+        has_values = true;
+      }
+      this.choices[i].rank = this.choices[i].value;
+    }
+    if (has_nulls) {
+      // Need to fill in the nulls with valid rank numbers
+      let step = 0.5 / this.choices.length;
+      if (has_values) {
+        // Need to fill in ranks consistent with the existing values
+        let done = false;
+        while ( !done ) {
+          done = true;
+          for (let i=0; i<(this.choices.length-1); i++) {
+            if ((this.choices[i].rank == null) && (this.choices[i+1].rank == null)) {
+              done = false;
+            } else if ((this.choices[i].rank == null) && (this.choices[i+1].rank != null)) {
+              this.choices[i].rank = this.choices[i+1].rank + step;
+            } else if ((this.choices[i].rank != null) && (this.choices[i+1].rank == null)) {
+              this.choices[i+1].rank = this.choices[i].rank - step;
+            } else {
+              // Nothing needs to be done
+            }
+          }
+        }
+      } else {
+        // Can use any consistent numbering for ranks
+        for (let i=0; i<this.choices.length; i++) {
+          this.choices[i].rank = this.choices.length-i;
         }
       }
-      ballot_list.push ( ballot );
     }
   }
-  return ( ballot_list );
+
+  adjust_lowest_to ( lowest_value ) {
+    this.choices[this.choices.length-1].value = lowest_value;
+    // Make the other values consistent from the bottom up
+    for (let i=this.choices.length-1; i>=1; i=i-1) {
+      if (this.choices[i-1].value < this.choices[i].value) {
+        this.choices[i-1].value = this.choices[i].value + 1;
+      }
+    }
+  }
+
+  adjust_choice_values() {
+    // Make the values consistent from the bottom up
+    let lowest_value = this.choices[this.choices.length-1].value;
+    for (let i=this.choices.length-1; i>=1; i=i-1) {
+      if (this.choices[i-1].value < this.choices[i].value) {
+        this.choices[i-1].value = this.choices[i].value + 1;
+      }
+    }
+  }
+
+  prefers ( a, b ) {
+    // Return 1 if this ballot prefers a over b, 0 if equal, -1 if b over a
+    let av = null;
+    let bv = null;
+    for (let i=0; i<this.choices.length; i++) {
+      if (this.choices[i].cand_name == a) {
+        av = this.choices[i].value;
+      }
+      if (this.choices[i].cand_name == b) {
+        bv = this.choices[i].value;
+      }
+    }
+    if ((av == null) && (bv == null)) return ( 0 );
+    if ((av != null) && (bv == null)) return ( 1 );
+    if ((av == null) && (bv != null)) return (-1 );
+  }
 }
+
+mb = new Ballot();
+mb.add ( 'g' );
+mb.add ( 'b' );
+mb.add ( 'd', 70 );
+mb.add ( 'f' );
+mb.add ( 'h' );
+mb.add ( 'a', 70 );
+mb.add ( 'c' );
+mb.add ( 'e' );
+mb
+
+
+
+function load() {
+
+}
+
+
+
+function get_cand_list ( ballot_text ) {
+
+	bt = ballot_text;
+
+	bt = bt.replaceAll ( '[', ' ' );
+
+	bt = bt.replaceAll ( ']', ' ' );
+
+	bt = bt.replaceAll ( '\n', ' ' );
+
+	while (bt.indexOf('  ') >= 0) {
+
+    bt = bt.replaceAll ( '  ', ' ' );
+
+  }
+
+  cand_set = new Set ( bt );
+
+  cand_set.delete ( ' ' );
+
+  cand_list = []
+
+	for (const i of cand_set) {
+
+	  cand_list.push ( i );
+
+	}
+
+	cand_list.sort();
+
+	return ( cand_list );
+
+}
+
+
+
+function get_ballot_list ( ballot_text ) {
+
+  bt = ballot_text;
+
+	bt = bt.replaceAll ( '\n', ' ' );
+
+	bt = bt.replaceAll ( ']', ' ' );
+
+	while (bt.indexOf('  ') >= 0) {
+
+  	bt = bt.replaceAll ( '  ', ' ' );
+
+  }
+
+	bt = bt.replaceAll ( ' [', '[' );
+
+	bt = bt.replaceAll ( '[ ', '[' );
+
+  bt = bt.trim();
+
+  bl = bt.split('[');
+
+  bll = bl.length;
+
+
+
+  ballot_list = [];
+
+  for (i=0; i<bll; i++) {
+
+    bs = bl[i].trim();
+
+    if (bs.length > 0) {
+
+      ballot = [];
+
+      bcs = bs.split(' ');
+
+      for (j=0; j<bcs.length; j++) {
+
+        if (bcs[j].trim().length > 0) {
+
+          ballot.push ( bcs[j].trim() );
+
+        }
+
+      }
+
+      ballot_list.push ( ballot );
+
+    }
+
+  }
+
+  return ( ballot_list );
+
+}
+
+
 
 function simple_plurality ( cand_list, ballot_text ) {
+
   ballots = get_ballot_list ( ballot_text );
+
   machine = {};
+
   for (i=0; i<cand_list.length; i++) {
+
     machine[cand_list[i]] = 0;
+
   }
+
   for (i=0; i<ballots.length; i++) {
+
     machine[ballots[i][0]] += 1;
+
   }
+
   result = "<b>Simple Plurality &nbsp; </b> (only the first choice matters):<br/>\n";
+
   for (i=0; i<cand_list.length; i++) {
+
     result += "Candidate <b>" + cand_list[i] 
+
             + "</b> got " + machine[cand_list[i]]
+
             + " first choice votes<br/>\n";
+
   }
+
   highest_votes = -1;
+
   highest_candidates = []
+
   for (i=0; i<cand_list.length; i++) {
+
     if (machine[cand_list[i]] > highest_votes) {
+
       highest_votes = machine[cand_list[i]];
+
     }
+
   }
+
   for (i=0; i<cand_list.length; i++) {
+
     if (machine[cand_list[i]] == highest_votes) {
+
       highest_candidates.push ( cand_list[i] );
+
     }
+
   }
+
   if (highest_candidates.length == 1) {
+
     result = result + "Candidate <b>" + highest_candidates[0] + "</b> won!";
+
   } else if (highest_candidates.length > 1) {
+
     for (i=0; i<highest_candidates.length; i++) {
+
       result = result + "Candidate <b>" + highest_candidates[i] + "</b> tied for the win.<br/>";
+
     }
+
   } else {
+
     result = result + "No Candidates Found.";
+
   }
+
     
+
   return ( result );
+
 }
+
+
 
 function instant_runoff ( cand_list, ballot_text ) {
+
   result = "<b><u>Instant Runoff</u>:</b><br/>\n";
 
+
+
   ballots = get_ballot_list ( ballot_text );
+
   winners = [];
 
+
+
   highest_candidates = []
+
   lowest_candidates = []
+
   while (winners.length <= 0) {
+
     machine = {};
+
     for (i=0; i<cand_list.length; i++) {
+
       machine[cand_list[i]] = 0;
+
     }
+
     for (i=0; i<ballots.length; i++) {
+
       machine[ballots[i][0]] += 1;
+
     }
+
     highest_votes = -1;
+
     highest_candidates = []
+
     lowest_votes = ballots.length + 2;
+
     lowest_candidates = []
+
     for (i=0; i<cand_list.length; i++) {
+
       if (machine[cand_list[i]] < lowest_votes) {
+
         lowest_votes = machine[cand_list[i]];
+
       }
+
       if (machine[cand_list[i]] > highest_votes) {
+
         highest_votes = machine[cand_list[i]];
+
       }
+
     }
+
     for (i=0; i<cand_list.length; i++) {
+
       if (machine[cand_list[i]] == lowest_votes) {
+
         lowest_candidates.push ( cand_list[i] );
+
       }
+
       if (machine[cand_list[i]] == highest_votes) {
+
         highest_candidates.push ( cand_list[i] );
+
       }
+
     }
+
     result = result + "Ballots: " + ballots + "<br/>\n" ;
+
     result = result + "Lowest: " + lowest_candidates + "<br/>\n" ;
+
     result = result + "Highest: " + highest_candidates + "<br/>\n" ;
+
     winners = highest_candidates;
+
   }
+
   result = result + "Instant Runoff is not implemented yet."
+
   return ( result );
+
 }
 
+
+
 function condorcet ( cand_list, ballot_text ) {
+
   ballots = get_ballot_list ( ballot_text );
+
   return ( "Condorcet is not implemented yet." );
+
 }
+
+
+
 
 
 function calc_results() {
 
+
+
 	ballot_area = document.getElementById ( "ballots" );
 
+
+
 	result_area = document.getElementById ( "results" );
+
 	ballot_text = ballot_area.value;
+
+
 
   cand_list = get_cand_list ( ballot_text );
 
+
+
 	if (document.getElementById("mode").value == "plurality_mode") {
+
 	  results = simple_plurality ( cand_list, ballot_text );
+
 	} else if (document.getElementById("mode").value == "instant_runoff_mode") {
+
 	  results = instant_runoff ( cand_list, ballot_text );
+
 	} else if (document.getElementById("mode").value == "condorcet_mode") {
+
 	  results = condorcet ( cand_list, ballot_text );
+
 	} else {
+
 	  results = "Mode not recognized.";
+
 	}
+
+
 
 	result_area.innerHTML = "<p>" + results + "</p>";
 
+
+
 }
 
+
+
 function change_methods() {
+
 }
+
+
 
 </script>
 
 
+
+
+
 <body bgcolor="lightblue" onload="load()">
+
 <center>
+
 <h2>Voting Methods Exploration</h2>
 
+
 <hr/>
+
 <h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
 Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
+
 <p/>
 
+
 <table width="100%">
+
 <tr>
 
-<td width="50%" valign="top">
-<textarea width="100%" id="ballots" rows="12" cols="40">
-[a c d b]
-[c a d b]
-[b]
-[c d b]
-[b c d]
-[d b a]
-[a c b d]
-[b d]
-</textarea>
-</td>
 
 <td width="50%" valign="top">
+
+<textarea width="100%" id="ballots" rows="12" cols="40">
+
+[a c d b]
+
+[c a d b]
+
+[b]
+
+[c d b]
+
+[b c d]
+
+[d b a]
+
+[a c b d]
+
+[b d]
+
+</textarea>
+
+</td>
+
+
+
+<td width="50%" valign="top">
+
 <ul>
+
 <li>Each ballot is enclosed in a set of square brackets.</li>
 <li>Choices are listed in the brackets separated by spaces.</li>
 <li>The first choice is listed first (on the left).<br/>
@@ -213,26 +564,48 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <li>Numeric values are expressed inside parentheses.<br/>
       Ballot with numeric values: [ b(100) d(70) a(70) c(10) ]</li>
 </ul>
+
 </td>
 
+
+
 </tr>
+
 </table>
+
+
 
 <p/>
 
+
+
 <select id="mode" onchange="change_methods()">
+
 <option value="plurality_mode">Simple Plurality</option>
+
 <option value="instant_runoff_mode">Instant Runoff</option>
+
 <option value="condorcet_mode">Condorcet</option>
+
 </select>
+
+
 
 <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
 
+
+
 <hr/>
+
 </center>
+
 
 <div id="results"></div>
 
+
+
 </body>
+
+
 
 </html>
