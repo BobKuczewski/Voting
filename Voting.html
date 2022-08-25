@@ -29,10 +29,14 @@
 
 </head>
 <script>
-/* Represent a ballot:
+/* Represent a ballot (format 2):
      Simple example ballot: [ b d a c f e ]
      Ballot with equal choices: [ b d=a c=f e ]
      Ballot with numeric values: [ b(100) d(70) a(70) c(10) f(10) e(1) ]
+   Represent a ballot (format 1):
+     Simple example ballot: b d a c f e \n
+     Ballot with equal choices:  b d=a c=f e \n
+     Ballot with numeric values:  b[100] d[70] a[70] c[10] f[10] e[1] \n
    In order to represent equal values (and support range voting):
      All choices will have a numeric value.
 */
