@@ -311,6 +311,8 @@ function simple_plurality ( ballot_text ) {
 
   let result = "<b>Simple Plurality &nbsp; </b> (only the first choice matters):<br/>\n";
 
+  result += "Total votes cast: <b>" + bb.ballots.length + "</b><br/>\n";
+
   for (let i=0; i<bb.cand_list.length; i++) {
     result += "Candidate <b>" + bb.cand_list[i]
             + "</b> got " + machine[bb.cand_list[i]]
@@ -534,7 +536,7 @@ function condorcet ( ballot_text ) {
 
   let bb = new BallotBox ( ballot_text );
 
-  let result = "<b>Condorcet Voting &nbsp; </b> (must defeat all others):<br/>\n";
+  let result = "<b>Condorcet Voting &nbsp; </b> (winner must defeat all others):<br/>\n";
 
   let num_candidates = bb.cand_list.length;
   let num_ballots = bb.ballots.length;
@@ -591,24 +593,20 @@ function condorcet ( ballot_text ) {
     result = result + "<b>No Condorcet Winner.<br/>\n";
   } else {
 
-    result = result + "<b>The Condorcet Winner is &nbsp; " + winner + " !\n";
-
-    result += "<hr/>\n";
-
-    for (let i=0; i<num_candidates; i++) {
-      for (let j=0; j<num_candidates; j++) {
-        if (i != j) {
-          if (bb.cand_list[i] == winner) {
-            result += " " + bb.cand_list[i] + " vs " + bb.cand_list[j] + ": " + table[i][j] + " to " + table[j][i] + "<br/>";
-          }
-        }
-      }
-    }
+    result = result + "<b>The Condorcet Winner is &nbsp; " + winner + "\n";
 
   }
 
-  // Show the table
+  // Show the tables
   result += "<hr/>\n";
+
+  // Results table (contains other tables)
+  result += "<table width=\"100%\" style=\"border: 0px;\">\n";
+  result += "<tr style=\"border: 0px;\">\n";
+
+
+  // Overall win/lose matrix
+  result += "<td width=\"30%\" valign=\"top\" style=\"border: 0px;\">\n";
   result += "<table>\n";
   for (let i=-1; i<num_candidates; i++) {
     result += "<tr>\n";
@@ -632,7 +630,67 @@ function condorcet ( ballot_text ) {
     result += "</tr>\n";
   }
   result += "</table>\n";
-  result += "<hr/>\n";
+  result += "</td>\n";
+
+  for (let cn=0; cn<num_candidates; cn++) {
+
+    if (bb.cand_list[cn] != winner) {
+
+      // Table of Ballots for A and B
+      let loser = bb.cand_list[cn];
+
+      result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+      result += "<table>\n";
+      result += "<tr><td colspan=\"2\"><b>" + winner + " v " + loser + "</b></td></tr>\n";
+      for (let k=0; k<num_ballots; k++) {
+        let b = bb.ballots[k];
+        let c = b.choices;
+        let found_1 = true;
+        let found_2 = true;
+        for (let ci=0; ci<c.length; ci++) {
+          if ( c[ci].cand_name == winner ) found_1 = true;
+          if ( c[ci].cand_name == loser  ) found_2 = true;
+        }
+        if (found_1 && found_2) {
+          result += "<tr>\n";
+          for (let ci=0; ci<c.length; ci++) {
+            if ( c[ci].cand_name == winner ) {
+              result += "<td>" + winner + "</td>\n";
+            }
+            if ( c[ci].cand_name == loser ) {
+              result += "<td>" + loser + "</td>\n";
+            }
+          }
+          result += "</td></tr>\n";
+        }
+      }
+      result += "</table>\n";
+      result += "</td>\n";
+
+    }
+
+  }
+
+  result += "</tr>\n";
+  result += "</table>\n";
+
+
+  if (winner != null) {
+
+    result += "<hr/>\n";
+
+    for (let i=0; i<num_candidates; i++) {
+      for (let j=0; j<num_candidates; j++) {
+        if (i != j) {
+          if (bb.cand_list[i] == winner) {
+            result += " " + bb.cand_list[i] + " vs " + bb.cand_list[j] + ": " + table[i][j] + " to " + table[j][i] + "<br/>";
+          }
+        }
+      }
+    }
+
+  }
+
 
   return ( result );
 }
@@ -681,6 +739,18 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 <textarea width="100%" id="ballots" rows="14" cols="30">
+a
+b
+c
+d
+e
+b
+a
+c
+e
+c
+</textarea>
+<!--
 A C B D
 B A C D
 B A D C
@@ -688,8 +758,7 @@ C B D A
 C A B D
 D A C B
 D A B C
-</textarea>
-<!--
+
 A C B D
 B A C D
 B A D C
