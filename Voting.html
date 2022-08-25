@@ -31,7 +31,6 @@ class Ballot {
   parse_ballot_string() {
     // Parse a ballot (optionally surrounded by [])
     if (this.s != null) {
-      console.log ( "this.s = " + this.s );
       this.choices = [];
       let in_value = false;
       let in_equals = false;
@@ -41,7 +40,6 @@ class Ballot {
       let i = 0;
       let this_choice = null;
       while (i < this.s.length) {
-        // console.log ( "s[" + i + "] = '" + this.s[i] + "'" );
         if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
           // Found a space or insignificant character
           i++;
@@ -163,7 +161,6 @@ class Ballot {
 
   prefers ( a, b ) {
     // Return 1 if this ballot prefers a over b, 0 if equal, -1 if b over a
-    console.log ( " " + a + " compared to " + b );
     let av = null;
     let bv = null;
     for (let i=0; i<this.choices.length; i++) {
@@ -174,7 +171,6 @@ class Ballot {
         bv = this.choices[i].rank;
       }
     }
-    console.log ( " after compare: av = " + av + ", bv = " + bv );
     if ((av == null) && (bv == null)) return ( 0 );
     if ((av != null) && (bv == null)) return ( 1 );
     if ((av == null) && (bv != null)) return (-1 );
@@ -221,12 +217,10 @@ class BallotBox {
   }
 
   build_cand_list() {
-    console.log ("build_cand_list called");
     let cands = [];
     for (let bi=0; bi<this.ballots.length; bi++) {
       let b = this.ballots[bi];
       for (let ci=0; ci<b.choices.length; ci++) {
-        console.log ( "Adding " + b.choices[ci].cand_name );
         cands.push ( b.choices[ci].cand_name );
       }
     }
@@ -237,7 +231,6 @@ class BallotBox {
       }
     }
     this.cand_list.sort();
-    console.log ( "Candidates = " + this.cand_list );
   }
 }
 
@@ -263,7 +256,6 @@ function simple_plurality ( ballot_text ) {
 
   for (let bi=0; bi<bb.ballots.length; bi++) {
     let b = bb.ballots[bi];
-    console.log ( "  " + b.s + " winner = " + b.choices[0].cand_name );
     machine[b.choices[0].cand_name] += 1;
   }
 
@@ -306,20 +298,38 @@ function range_voting ( ballot_text ) {
 
   let bb = new BallotBox ( ballot_text );
 
+  let result = "<b>Range Voting &nbsp; </b> (sum of scores matters):<br/>\n";
+
   let machine = {};
   for (let i=0; i<bb.cand_list.length; i++) {
     machine[bb.cand_list[i]] = 0;
   }
+  let found_one = false;
   for (let bi=0; bi<bb.ballots.length; bi++) {
     let b = bb.ballots[bi];
     for (let ci=0; ci<b.choices.length; ci++) {
       if (b.choices[ci].value != null) {
         machine[b.choices[ci].cand_name] += b.choices[ci].value;
+        found_one = true;
       }
     }
   }
 
-  let result = "<b>Range Voting &nbsp; </b> (sum of scores matters):<br/>\n";
+  if (found_one == false) {
+    result += "Range voting requires at least one score, but none were given.<br/>\n";
+    result += "Automatic scores were generated based on simple ordering.<br/>\n";
+    machine = {};
+    for (let i=0; i<bb.cand_list.length; i++) {
+      machine[bb.cand_list[i]] = 0;
+    }
+    for (let bi=0; bi<bb.ballots.length; bi++) {
+      let b = bb.ballots[bi];
+      for (let ci=0; ci<b.choices.length; ci++) {
+        b.choices[ci].value = b.choices.length - ci;
+        machine[b.choices[ci].cand_name] += b.choices[ci].value;
+      }
+    }
+  }
 
   let max_val = -1;
   for (let i=0; i<bb.cand_list.length; i++) {
@@ -419,11 +429,13 @@ function instant_runoff ( ballot_text ) {
 
       // Save the winner to terminate the loop
       winner = highest_candidates;
+      result += "&nbsp; &nbsp; Majority Winner: <b>" + winner + "</b> had " + highest_value + " first choice votes.<br/>";
 
     } else if (remaining_cand_list.length <= 1) {
 
       // Save the winner to terminate the loop
       winner = remaining_cand_list[0];
+      result += "&nbsp; &nbsp; Last remaining: <b>" + winner + "</b><br/>";
 
     } else {
 
@@ -496,17 +508,13 @@ function condorcet ( ballot_text ) {
         num_votes_for_i = 0;
         num_votes_for_j = 0;
         for (let k=0; k<num_ballots; k++) {
-          console.log ( "Compare " + i + " and " + j + " for ballot " + k );
-          // let this_result = bb.ballotAt(k).compare ( (String)(clist.elementAt(i)), (String)(clist.elementAt(j)) );
           let this_result = bb.ballots[k].prefers ( bb.cand_list[i], bb.cand_list[j] );
-          console.log ( "  Compare Result: " + this_result );
           if (this_result > 0) {
             num_votes_for_i++;
           } else if (this_result < 0) {
             num_votes_for_j++;
           }
         }
-        console.log ( "Votes for i: " + num_votes_for_i + ", Votes for j: " + num_votes_for_j );
         if (num_votes_for_i <= num_votes_for_j) {
           lost_or_tied[i] = true;
         }
@@ -517,10 +525,8 @@ function condorcet ( ballot_text ) {
   // Now check to see if there is a Condorcet winner
   let winner = null;
   for (let i=0; i<num_candidates; i++) {
-    console.log ( "Candidate " + i + " lost_or_tied = " + lost_or_tied[i] );
     if (lost_or_tied[i] == false) {
       winner = bb.cand_list[i];
-      console.log ( "Winner = " + winner );
       // break;
     }
   }
