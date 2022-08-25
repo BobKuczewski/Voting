@@ -3,18 +3,28 @@
 <head>
 <title>Voting Methods Exploration</title>
 <style>
-	table, tr, th, td {
-		border: 1px solid black;
-	}
-	td {
-		font-family: monospace;
-		font-weight: bold;
-		font-size: 110%;
-		padding-top: 3px;
-		padding-left: 5px;
-		padding-right: 5px;
-		padding-bottom: 1px;
-	}
+  table, tr, th, td {
+    border: 1px solid black;
+  }
+  td, th {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 110%;
+    padding-top: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 1px;
+  }
+  th {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 120%;
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    background: #eea;
+  }
 </style>
 
 </head>
@@ -37,14 +47,24 @@ class Choice {
 
 class Ballot {
 
-  constructor(s=null) {
+  constructor(s=null,format=2) {
     this.s = s;
     this.choices = [];
-    this.parse_ballot_string();
+    if (format == 2) {
+      this.parse_fmt2_ballot_string();
+    } else {
+      this.parse_fmt1_ballot_string();
+    }
   }
 
-  parse_ballot_string() {
-    // Parse a ballot (optionally surrounded by [])
+  parse_fmt1_ballot_string() {
+    this.s = this.s.replaceAll ( '[', '(' );
+    this.parse_fmt2_ballot_string();
+  }
+
+  parse_fmt2_ballot_string() {
+    // Parse one ballot (optionally surrounded by [])
+    console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
       this.choices = [];
       let in_value = false;
@@ -97,7 +117,7 @@ class Ballot {
               value = null;
             }
             let start = i;
-            while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(this.s[i]) >= 0) ) {
+            while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
               i++;
             }
             name = this.s.substring(start,i);
@@ -217,10 +237,22 @@ class BallotBox {
     this.ballots = [];
     this.cand_list = [];
     if (this.s != null) {
-      let blist = s.split('[');
-      for (let i=0; i<blist.length; i++) {
-        if (blist[i].length > 0) {
-          this.add ( new Ballot ( blist[i].replace(']',' ').trim() ) );
+      // Decide if this is format 1 or 2
+      if (this.s.trim()[0] != '[') {
+        // Format 1: Ballots separated by newline, range values in []
+        let blist = s.split('\n');
+        for (let i=0; i<blist.length; i++) {
+          if (blist[i].trim().length > 0) {
+            this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
+          }
+        }
+      } else {
+        // Format 2: Ballots enclosed in [], range values in ()
+        let blist = s.split('[');
+        for (let i=0; i<blist.length; i++) {
+          if (blist[i].length > 0) {
+            this.add ( new Ballot ( blist[i].replace(']',' ').trim() ) );
+          }
         }
       }
       this.build_cand_list()
@@ -258,7 +290,6 @@ bc.add ( new Ballot ( "a b(100)" ) );
 bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 */
 
-
 function simple_plurality ( ballot_text ) {
   console.log ( "Running Plurality" );
 
@@ -277,7 +308,7 @@ function simple_plurality ( ballot_text ) {
   let result = "<b>Simple Plurality &nbsp; </b> (only the first choice matters):<br/>\n";
 
   for (let i=0; i<bb.cand_list.length; i++) {
-    result += "Candidate <b>" + bb.cand_list[i] 
+    result += "Candidate <b>" + bb.cand_list[i]
             + "</b> got " + machine[bb.cand_list[i]]
             + " first choice votes<br/>\n";
   }
@@ -306,7 +337,6 @@ function simple_plurality ( ballot_text ) {
 
   return ( result );
 }
-
 
 function range_voting ( ballot_text ) {
   console.log ( "Running Range" );
@@ -351,7 +381,7 @@ function range_voting ( ballot_text ) {
     if (machine[bb.cand_list[i]] > max_val) {
       max_val = machine[bb.cand_list[i]];
     }
-    result += "Candidate <b>" + bb.cand_list[i] 
+    result += "Candidate <b>" + bb.cand_list[i]
             + "</b> got a sum total of " + machine[bb.cand_list[i]]
             + "<br/>\n";
   }
@@ -371,7 +401,6 @@ function range_voting ( ballot_text ) {
 
   return ( result );
 }
-
 
 function instant_runoff ( ballot_text ) {
   console.log ( "Running Instant Runoff" );
@@ -402,7 +431,7 @@ function instant_runoff ( ballot_text ) {
     // See if there is a majority winner among the first choices
     // Also keep track of the loser among the first choices
 
-    // Zero the machine for all entries 
+    // Zero the machine for all entries
     let machine = {};
     for (let i=0; i<remaining_cand_list.length; i++) {
       machine[remaining_cand_list[i]] = 0;
@@ -412,7 +441,7 @@ function instant_runoff ( ballot_text ) {
     for (let bi=0; bi<ballot_list.length; bi++) {
       machine[ballot_list[bi][0]] += 1;
     }
-    
+
     // Find the highest and lowest values
     let highest_value = null;
     let lowest_value = null;
@@ -480,7 +509,7 @@ function instant_runoff ( ballot_text ) {
       }
 
     }
-    
+
   }
 
   if (winner.length <= 1) {
@@ -491,7 +520,6 @@ function instant_runoff ( ballot_text ) {
 
   return ( result );
 }
-
 
 function condorcet ( ballot_text ) {
   // The Condorcet Winner is the one candidate that will beat all others in a one on one election
@@ -558,7 +586,7 @@ function condorcet ( ballot_text ) {
   if (winner == null) {
     result = result + "<b>No Condorcet Winner.<br/>\n";
   } else {
-    
+
     result = result + "<b>The Condorcet Winner is &nbsp; " + winner + " !\n";
 
     result += "<hr/>\n";
@@ -578,16 +606,24 @@ function condorcet ( ballot_text ) {
   // Show the table
   result += "<hr/>\n";
   result += "<table>\n";
-  for (let i=0; i<num_candidates; i++) {
+  for (let i=-1; i<num_candidates; i++) {
     result += "<tr>\n";
-    for (let j=0; j<num_candidates; j++) {
-      result += "<td><center>\n";
+    for (let j=-1; j<num_candidates; j++) {
       if (i == j) {
-        result += "\\";
+        if (i < 0) {
+          result += "<th><center>\\</center></th>\n";
+        } else {
+          result += "<td><center>\\</center></td>\n";
+        }
       } else {
-        result += table[i][j];
+        if (i < 0) {
+          result += "<th><center>" + bb.cand_list[j] + "</center></th>\n";
+        } else if (j < 0) {
+          result += "<th><center>" + bb.cand_list[i] + "</center></th>\n";
+        } else {
+          result += "<td><center>" + table[i][j] + "</center></td>\n";
+        }
       }
-      result += "</center></td>\n";
     }
     result += "</tr>\n";
   }
@@ -597,27 +633,26 @@ function condorcet ( ballot_text ) {
   return ( result );
 }
 
-
 function calc_results() {
 
-	ballot_area = document.getElementById ( "ballots" );
+  ballot_area = document.getElementById ( "ballots" );
 
-	result_area = document.getElementById ( "results" );
-	ballot_text = ballot_area.value;
+  result_area = document.getElementById ( "results" );
+  ballot_text = ballot_area.value;
 
-	if (document.getElementById("mode").value == "plurality_mode") {
-	  results = simple_plurality ( ballot_text );
-	} else if (document.getElementById("mode").value == "range_mode") {
-	  results = range_voting ( ballot_text );
-	} else if (document.getElementById("mode").value == "instant_runoff_mode") {
-	  results = instant_runoff ( ballot_text );
-	} else if (document.getElementById("mode").value == "condorcet_mode") {
-	  results = condorcet ( ballot_text );
-	} else {
-	  results = "Mode not recognized.";
-	}
+  if (document.getElementById("mode").value == "plurality_mode") {
+    results = simple_plurality ( ballot_text );
+  } else if (document.getElementById("mode").value == "range_mode") {
+    results = range_voting ( ballot_text );
+  } else if (document.getElementById("mode").value == "instant_runoff_mode") {
+    results = instant_runoff ( ballot_text );
+  } else if (document.getElementById("mode").value == "condorcet_mode") {
+    results = condorcet ( ballot_text );
+  } else {
+    results = "Mode not recognized.";
+  }
 
-	result_area.innerHTML = "<p>" + results + "</p>";
+  result_area.innerHTML = "<p>" + results + "</p>";
 
 }
 
@@ -628,7 +663,6 @@ function load() {
 }
 
 </script>
-
 
 <body bgcolor="lightblue" onload="load()">
 <center>
@@ -656,13 +690,11 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 [d a c b]
 [a c b d]
 
-
 [a b c]
 [b a c]
 [b a c]
 [c a b]
 [c a b]
-
 
 [a b c d e f]
 [b a c d e f]
@@ -677,12 +709,10 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 [f a b c d e]
 [f a b c d e]
 
-
 [a(100) c(70) d(40) b(10)]
 [c(60) a(50) d(30) b(0)]
 [b(100)]
 [b(100)]
-
 
 [a c d b]
 [c a d b]
