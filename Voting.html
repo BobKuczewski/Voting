@@ -530,7 +530,7 @@ function condorcet ( ballot_text ) {
 
   let bb = new BallotBox ( ballot_text );
 
-  let result = "<b>Condorcet Voting &nbsp; </b> (defeating all others matters):<br/>\n";
+  let result = "<b>Condorcet Voting &nbsp; </b> (must defeat all others):<br/>\n";
 
   let num_candidates = bb.cand_list.length;
   let num_ballots = bb.ballots.length;
@@ -677,15 +677,23 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 <textarea width="100%" id="ballots" rows="14" cols="30">
-[A C B D]
-[B A C D]
-[B A D C]
-[C B D A]
-[C A B D]
-[D A C B]
-[D A B C]
+A C B D
+B A C D
+B A D C
+C B D A
+C A B D
+D A C B
+D A B C
 </textarea>
 <!--
+A C B D
+B A C D
+B A D C
+C B D A
+C A B D
+D A C B
+D A B C
+
 [b c a d]
 [d a c b]
 [a c b d]
