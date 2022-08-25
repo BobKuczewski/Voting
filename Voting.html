@@ -163,19 +163,24 @@ class Ballot {
 
   prefers ( a, b ) {
     // Return 1 if this ballot prefers a over b, 0 if equal, -1 if b over a
+    console.log ( " " + a + " compared to " + b );
     let av = null;
     let bv = null;
     for (let i=0; i<this.choices.length; i++) {
       if (this.choices[i].cand_name == a) {
-        av = this.choices[i].value;
+        av = this.choices[i].rank;
       }
       if (this.choices[i].cand_name == b) {
-        bv = this.choices[i].value;
+        bv = this.choices[i].rank;
       }
     }
+    console.log ( " after compare: av = " + av + ", bv = " + bv );
     if ((av == null) && (bv == null)) return ( 0 );
     if ((av != null) && (bv == null)) return ( 1 );
     if ((av == null) && (bv != null)) return (-1 );
+    if (av > bv) return ( 1 );
+    if (av < bv) return (-1 );
+    if (av == bv) return ( 0 );
   }
 
 }
@@ -286,7 +291,7 @@ function simple_plurality ( ballot_text ) {
     result = result + " --&gt; Candidate <b>" + highest_candidates[0] + "</b> won!";
   } else if (highest_candidates.length > 1) {
     for (i=0; i<highest_candidates.length; i++) {
-      result = result + "Candidate <b>" + highest_candidates[i] + "</b> tied for the win.<br/>";
+      result = result + " --&gt; Candidate <b>" + highest_candidates[i] + "</b> tied for the win.<br/>";
     }
   } else {
     result = result + "No Candidates Found.";
@@ -350,7 +355,6 @@ function instant_runoff ( ballot_text ) {
 
   let result = "<b>Instant Runoff Voting &nbsp; </b> (early plurality matters):<br/>\n";
 
-  console.log ( "build ballot_list" );
   // Build a list of ballots made up of lists of candidate names
   let ballot_list = [];
   for (let bi=0; bi<bb.ballots.length; bi++) {
@@ -362,13 +366,6 @@ function instant_runoff ( ballot_text ) {
     ballot_list.push ( cl );
   }
 
-console.log ( "ballot_list:" );
-for (let bi=0; bi<ballot_list.length; bi++) {
-  console.log ( "  ballot_list[" + bi + "][0] = " + ballot_list[bi][0] );
-}
-
-  console.log ( "enter winner loop" );
-  
   remaining_cand_list = [];
   for (let i=0; i<bb.cand_list.length; i++) {
     remaining_cand_list.push ( bb.cand_list[i] );
@@ -376,9 +373,6 @@ for (let bi=0; bi<ballot_list.length; bi++) {
 
   winner = null;
   while (winner == null) {
-
-    console.log ( "Remaining Candidates = " + remaining_cand_list );
-    console.log ( "Looking for winners in " + ballot_list );
 
     // See if there is a majority winner among the first choices
     // Also keep track of the loser among the first choices
@@ -391,7 +385,6 @@ for (let bi=0; bi<ballot_list.length; bi++) {
 
     // Tally the first place votes for every ballot
     for (let bi=0; bi<ballot_list.length; bi++) {
-      console.log ( "  tallying a vote for " + ballot_list[bi][0] );
       machine[ballot_list[bi][0]] += 1;
     }
     
@@ -407,8 +400,6 @@ for (let bi=0; bi<ballot_list.length; bi++) {
         lowest_value = v;
       }
     }
-    console.log ( "  Highest votes = " + highest_value );
-    console.log ( "  Lowest  votes = " + lowest_value );
 
     // Find the candidates matching the highest and lowest values
     let highest_candidates = [];
@@ -422,8 +413,6 @@ for (let bi=0; bi<ballot_list.length; bi++) {
         lowest_candidates.push ( remaining_cand_list[i] );
       }
     }
-    console.log ( "  Highest candidates = " + highest_candidates );
-    console.log ( "  Lowest  candidates = " + lowest_candidates );
 
     // Check if there is a winner
     if ((2*highest_value) > bb.ballots.length) {
@@ -437,9 +426,13 @@ for (let bi=0; bi<ballot_list.length; bi++) {
       winner = remaining_cand_list[0];
 
     } else {
-console.log ( "  No winner so eliminate " + lowest_candidates );
+
       // Eliminate the lowest candidate(s) from remaining_cand_list
-      result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b></b><br/>";
+      if (lowest_candidates.length > 1) {
+        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b> (random)<br/>";
+      } else {
+        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b><br/>";
+      }
       let reduced_list = [];
       for (let ci=0; ci<remaining_cand_list.length; ci++) {
         if (remaining_cand_list[ci] != lowest_candidates[0]) { // Note should use random index
@@ -447,26 +440,16 @@ console.log ( "  No winner so eliminate " + lowest_candidates );
         }
       }
       remaining_cand_list = reduced_list;
+
       // Eliminate the lowest candidate(s) from each ballot
       for (let bi=0; bi<ballot_list.length; bi++) {
-console.log ( "  Working on ballot " + bi );
         let reduced_ballot = [];
         for (let ci=0; ci<ballot_list[bi].length; ci++) {
           if (ballot_list[bi][ci] != lowest_candidates[0]) { // Note should use random index
             reduced_ballot.push ( ballot_list[bi][ci] );
           }
         }
-console.log ( "    Before reduction: " + ballot_list );
-for (let k=0; k<ballot_list.length; k++) {
-  console.log ( "      " + ballot_list[k] );
-}
-console.log ( "    Before reduction: " + ballot_list );
-console.log ( "      replacing " + ballot_list[bi] + " with " + reduced_ballot );
         ballot_list[bi] = reduced_ballot;
-console.log ( "    After reduction: " + ballot_list );
-for (let k=0; k<ballot_list.length; k++) {
-  console.log ( "      " + ballot_list[k] );
-}
       }
 
     }
@@ -484,10 +467,71 @@ for (let k=0; k<ballot_list.length; k++) {
 
 
 function condorcet ( ballot_text ) {
+  // The Condorcet Winner is the one candidate that will beat all others in a one on one election
+  // There can only be (at most) one Condorcet winner because two winners would imply that they beat each other
+  // However, there may be conditions where no one candidate can beat all others meaning that there is no Condorcet Winner
+
   console.log ( "Running Condorcet" );
 
-  bb = new BallotBox ( ballot_text );
-  return ( "Condorcet is not implemented yet." );
+  let bb = new BallotBox ( ballot_text );
+
+  let result = "<b>Condorcet Voting &nbsp; </b> (defeating all others matters):<br/>\n";
+
+  let num_candidates = bb.cand_list.length;
+  let num_ballots = bb.ballots.length;
+
+  let lost_or_tied = [];
+  for (let i=0; i<num_candidates; i++) {
+    lost_or_tied.push ( false );
+  }
+
+  // Loop through pitting each candidate against every other candidate
+  let num_votes_for_i = 0;
+  let num_votes_for_j = 0;
+  for (let i=0; i<num_candidates; i++) {
+    for (let j=0; j<num_candidates; j++) {
+      // Check to see if this is a comparison of a candidate against themselves
+      if (i != j) {
+        // Loop through all the ballots to see if i beats j
+        num_votes_for_i = 0;
+        num_votes_for_j = 0;
+        for (let k=0; k<num_ballots; k++) {
+          console.log ( "Compare " + i + " and " + j + " for ballot " + k );
+          // let this_result = bb.ballotAt(k).compare ( (String)(clist.elementAt(i)), (String)(clist.elementAt(j)) );
+          let this_result = bb.ballots[k].prefers ( bb.cand_list[i], bb.cand_list[j] );
+          console.log ( "  Compare Result: " + this_result );
+          if (this_result > 0) {
+            num_votes_for_i++;
+          } else if (this_result < 0) {
+            num_votes_for_j++;
+          }
+        }
+        console.log ( "Votes for i: " + num_votes_for_i + ", Votes for j: " + num_votes_for_j );
+        if (num_votes_for_i <= num_votes_for_j) {
+          lost_or_tied[i] = true;
+        }
+      }
+    }
+  }
+
+  // Now check to see if there is a Condorcet winner
+  let winner = null;
+  for (let i=0; i<num_candidates; i++) {
+    console.log ( "Candidate " + i + " lost_or_tied = " + lost_or_tied[i] );
+    if (lost_or_tied[i] == false) {
+      winner = bb.cand_list[i];
+      console.log ( "Winner = " + winner );
+      // break;
+    }
+  }
+
+  if (winner == null) {
+    result = result + "<b>No Condorcet Winner.<br/>\n";
+  } else {
+    result = result + "<b>The Condorcet Winner is &nbsp; " + winner + " !\n";
+  }
+
+  return ( result );
 }
 
 
@@ -536,13 +580,34 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <tr>
 
 <td width="30%" valign="top">
-<textarea width="100%" id="ballots" rows="12" cols="30">
+<textarea width="100%" id="ballots" rows="14" cols="30">
+[a b c]
+[b a c]
+[b a c]
+[c a b]
+[c a b]
+</textarea>
+<!--
+[a b c d e f]
+[b a c d e f]
+[b a c d e f]
+[c a b d e f]
+[c a b d e f]
+[d a b c e f]
+[d a b c e f]
+[e a b c d f]
+[e a b c d f]
+[f a b c d e]
+[f a b c d e]
+[f a b c d e]
+
+
 [a(100) c(70) d(40) b(10)]
 [c(60) a(50) d(30) b(0)]
 [b(100)]
 [b(100)]
-</textarea>
-<!--
+
+
 [a c d b]
 [c a d b]
 [b]
