@@ -46,6 +46,11 @@ class Choice {
     this.cand_name = name;
     this.value = value;
     this.rank = null;  // The rank provides the ordering. Multiple candidates may share the same rank.
+    this.equals = false;
+  }
+  print_to_string() {
+    let s = "cand: " + this.cand_name + ", val: " + this.value + ", rank: " + this.rank + ", eq: " + this.equals;
+    return ( s );
   }
 }
 
@@ -59,6 +64,14 @@ class Ballot {
     } else {
       this.parse_fmt1_ballot_string();
     }
+  }
+
+  print_to_string() {
+    let s = this.s + "\n";
+    for (let i=0; i<this.choices.length; i++) {
+      s = s + "  Choice " + i + ": " + this.choices[i].print_to_string() + "\n";
+    }
+    return ( s );
   }
 
   parse_fmt1_ballot_string() {
@@ -126,6 +139,10 @@ class Ballot {
             }
             name = this.s.substring(start,i);
             this_choice = new Choice(name);
+            if (in_equals) {
+              this_choice.equals = true;
+              in_equals = false;
+            }
           }
         }
       }
@@ -196,6 +213,14 @@ class Ballot {
         }
       }
     }
+    // Handle the equals
+    for (let i=0; i<this.choices.length; i++) {
+      if (this.choices[i].equals == true) {
+        if (i > 0) {
+          this.choices[i].rank = this.choices[i-1].rank;
+        }
+      }
+    }
   }
 
   prefers ( a, b ) {
@@ -261,6 +286,15 @@ class BallotBox {
       }
       this.build_cand_list()
     }
+    console.log ( this.print_to_string() );
+  }
+
+  print_to_string() {
+    let s = this.s + "\n";
+    for (let i=0; i<this.ballots.length; i++) {
+      s = s + " Ballot " + i + ": " + this.ballots[i].print_to_string() + "\n";
+    }
+    return ( s );
   }
 
   add ( ballot ) {
@@ -739,6 +773,26 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 <textarea width="100%" id="ballots" rows="14" cols="30">
+[C B A=D]
+[A C B D]
+[B C A=D]
+[A=D C B]
+[D C=B A]
+</textarea>
+<!--
+[C B A=D]
+[A C B D]
+[B C A=D]
+[A=D C B]
+[D C=B A]
+
+C[3] > B[2] > A[1] = D[1]
+A[4] > C[3] > B[2] > D[1]
+B[3] > C[2] > A[1] = D[1]
+A[3] = D[3] > C[2] > B[1]
+D[3] > C[2] = B[2] > A[1]
+
+
 a
 b
 c
@@ -749,8 +803,7 @@ a
 c
 e
 c
-</textarea>
-<!--
+
 A C B D
 B A C D
 B A D C
