@@ -616,9 +616,11 @@ function condorcet ( ballot_text ) {
 
   // Now check to see if there is a Condorcet winner
   let winner = null;
+  let winner_index = null;
   for (let i=0; i<num_candidates; i++) {
     if (lost_or_tied[i] == false) {
       winner = bb.cand_list[i];
+      winner_index = i;
       // break;
     }
   }
@@ -632,6 +634,7 @@ function condorcet ( ballot_text ) {
   }
 
   // Show the tables
+
   result += "<hr/>\n";
 
   // Results table (contains other tables)
@@ -666,51 +669,70 @@ function condorcet ( ballot_text ) {
   result += "</table>\n";
   result += "</td>\n";
 
-  for (let cn=0; cn<num_candidates; cn++) {
+  // Comparison of winner to each other candidate
+  if (winner != null) {
 
-    if (bb.cand_list[cn] != winner) {
+    for (let cn=0; cn<num_candidates; cn++) {
 
-      // Table of Ballots for A and B
-      let loser = bb.cand_list[cn];
+      if (bb.cand_list[cn] != winner) {
 
-      result += "<td valign=\"top\" style=\"border: 0px;\">\n";
-      result += "<table>\n";
-      result += "<tr><td colspan=\"2\"><b>" + winner + " v " + loser + "</b></td></tr>\n";
-      for (let k=0; k<num_ballots; k++) {
-        let b = bb.ballots[k];
-        let c = b.choices;
-        let found_1 = true;
-        let found_2 = true;
-        for (let ci=0; ci<c.length; ci++) {
-          if ( c[ci].cand_name == winner ) found_1 = true;
-          if ( c[ci].cand_name == loser  ) found_2 = true;
-        }
-        if (found_1 && found_2) {
-          result += "<tr>\n";
+        // Table of Ballots for winner and loser cn
+        let loser = bb.cand_list[cn];
+
+        result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+        result += "<table>\n";
+        result += "<tr><th colspan=\"2\"><b>" + winner + " v " + loser + "</b></th></tr>\n";
+        for (let k=0; k<num_ballots; k++) {
+          let b = bb.ballots[k];
+          let c = b.choices;
+          let winner_index = -1;
+          let loser_index = -1;
           for (let ci=0; ci<c.length; ci++) {
-            if ( c[ci].cand_name == winner ) {
-              result += "<td>" + winner + "</td>\n";
-            }
-            if ( c[ci].cand_name == loser ) {
-              result += "<td>" + loser + "</td>\n";
-            }
+            if ( c[ci].cand_name == winner ) winner_index = ci;
+            if ( c[ci].cand_name == loser  ) loser_index = ci;
           }
-          result += "</td></tr>\n";
+          if ( (winner_index < 0) && (loser_index < 0) ) {
+            result += "<tr><td>?</td><td>?</td></tr>\n";
+          } else if (loser_index < 0) {
+            result += "<tr><td>" + c[winner_index].cand_name + "</td><td> </td></tr>\n";
+          } else if (winner_index < 0) {
+            result += "<tr><td> </td><td>" + c[loser_index].cand_name + "</td></tr>\n";
+          } else if (c[winner_index].rank == c[loser_index].rank) {
+            result += "<tr><td>=</td><td>=</td></tr>\n";
+          } else if (c[winner_index].rank > c[loser_index].rank) {
+            result += "<tr><td>" + c[winner_index].cand_name + "</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
+          } else if (c[winner_index].rank < c[loser_index].rank) {
+            result += "<tr><td>" + c[loser_index].cand_name + "</td><td>" + c[winner_index].cand_name + "</td></tr>\n";
+          } else {
+            result += "<tr><td>??</td><td>??</td></tr>\n";
+          }
+          /*
+          if (found_winner && found_loser) {
+            result += "<tr>\n";
+            for (let ci=0; ci<c.length; ci++) {
+              if ( c[ci].cand_name == winner ) {
+                result += "<td>" + winner + "</td>\n";
+              }
+              if ( c[ci].cand_name == loser ) {
+                result += "<td>" + loser + "</td>\n";
+              }
+            }
+            result += "</td></tr>\n";
+          }
+          */
         }
+        result += "</table>\n";
+        result += "<p>" + winner + " vs " + loser + ":<br/> " + table[winner_index][cn] + " to " + table[cn][winner_index] + "</p>";
+        result += "</td>\n";
+
       }
-      result += "</table>\n";
-      result += "</td>\n";
 
     }
 
-  }
+    result += "</tr>\n";
+    result += "</table>\n";
 
-  result += "</tr>\n";
-  result += "</table>\n";
-
-
-  if (winner != null) {
-
+    /* Optional Text Report
     result += "<hr/>\n";
 
     for (let i=0; i<num_candidates; i++) {
@@ -722,6 +744,7 @@ function condorcet ( ballot_text ) {
         }
       }
     }
+    */
 
   }
 
