@@ -339,10 +339,13 @@ bc.add ( new Ballot ( "a b(100)" ) );
 bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 */
 
+// Global ballot box
+bb = null;
+
 function simple_plurality ( ballot_text ) {
   console.log ( "Running Plurality" );
 
-  let bb = new BallotBox ( ballot_text );
+  /* let */ bb = new BallotBox ( ballot_text );
 
   let machine = {};
   for (i=0; i<bb.cand_list.length; i++) {
@@ -392,7 +395,7 @@ function simple_plurality ( ballot_text ) {
 function range_voting ( ballot_text ) {
   console.log ( "Running Range" );
 
-  let bb = new BallotBox ( ballot_text );
+  /* let */ bb = new BallotBox ( ballot_text );
 
   let result = "<b>Range Voting &nbsp; </b> (sum of scores matters):<br/>\n";
 
@@ -456,7 +459,7 @@ function range_voting ( ballot_text ) {
 function instant_runoff ( ballot_text ) {
   console.log ( "Running Instant Runoff" );
 
-  let bb = new BallotBox ( ballot_text );
+  /* let */ bb = new BallotBox ( ballot_text );
 
   let result = "<b>Instant Runoff Voting &nbsp; </b> (early plurality matters):<br/>\n";
 
@@ -579,7 +582,7 @@ function condorcet ( ballot_text ) {
 
   console.log ( "Running Condorcet" );
 
-  let bb = new BallotBox ( ballot_text );
+  /* let */ bb = new BallotBox ( ballot_text );
 
   let result = "<b>Condorcet Voting &nbsp; </b> (winner must defeat all others):<br/>\n";
 
