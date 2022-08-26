@@ -301,6 +301,17 @@ class BallotBox {
     this.ballots.push ( ballot );
   }
 
+  get_max_choices() {
+    let max_choices = 0;
+    for (let bi=0; bi<this.ballots.length; bi++) {
+      let b = this.ballots[bi];
+      if (max_choices < b.choices.length) {
+        max_choices = b.choices.length;
+      }
+    }
+    return ( max_choices );
+  }
+
   build_cand_list() {
     let cands = [];
     for (let bi=0; bi<this.ballots.length; bi++) {
@@ -633,7 +644,7 @@ function condorcet ( ballot_text ) {
 
   }
 
-  // Show the tables
+  // Show the win/loss table and an explanation
 
   result += "<hr/>\n";
 
@@ -642,8 +653,8 @@ function condorcet ( ballot_text ) {
   result += "<tr style=\"border: 0px;\">\n";
 
 
-  // Overall win/lose matrix
-  result += "<td width=\"30%\" valign=\"top\" style=\"border: 0px;\">\n";
+  // Overall win/loss matrix
+  result += "<td valign=\"top\" style=\"border: 0px;\">\n";
   result += "<table>\n";
   for (let i=-1; i<num_candidates; i++) {
     result += "<tr>\n";
@@ -666,11 +677,52 @@ function condorcet ( ballot_text ) {
     }
     result += "</tr>\n";
   }
+
   result += "</table>\n";
   result += "</td>\n";
 
-  // Comparison of winner to each other candidate
+  result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+  result += "<p>\n";
+  result += "Result Tables\n";
+  result += "</p>\n";
+  result += "<p>\n";
+  result += "The table to the left shows the win/loss counts for each pair \n";
+  result += "of candidates. If there is a Condorcet Winner, then there will \n";
+  result += "also be a series of tables below. These tables (below) will show how \n";
+  result += "each ballot contributed to the winner defeating every other candidate \n";
+  result += "in the election. \n";
+  result += "</p>\n";
+  result += "</td>\n";
+
+  result += "</tr>\n";
+  result += "</table>\n";
+
   if (winner != null) {
+
+    // Show the tables comparing the winner with each loser
+
+    result += "<hr/>\n";
+
+    // Results table (contains other tables)
+    result += "<table width=\"100%\" style=\"border: 0px;\">\n";
+    result += "<tr style=\"border: 0px;\">\n";
+
+    // Raw ballot table
+    let max_choices = bb.get_max_choices();
+    result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+    result += "<table>\n";
+    result += "<tr><th colspan=\"" + max_choices + "\"><b>" + "Ballots" + "</b></th></tr>\n";
+    for (let r=0; r<5; r++) {
+      result += "<tr>\n";
+      for (let c=0; c<max_choices; c++) {
+        result += "<td>A</td>\n";
+      }
+      result += "</tr>\n";
+    }
+    result += "</table>\n";
+    result += "</td>\n";
+
+    // Comparison of winner to each other candidate
 
     for (let cn=0; cn<num_candidates; cn++) {
 
@@ -729,9 +781,6 @@ function condorcet ( ballot_text ) {
 
     }
 
-    result += "</tr>\n";
-    result += "</table>\n";
-
     /* Optional Text Report
     result += "<hr/>\n";
 
@@ -747,7 +796,6 @@ function condorcet ( ballot_text ) {
     */
 
   }
-
 
   return ( result );
 }
