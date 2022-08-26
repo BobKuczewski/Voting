@@ -788,19 +788,22 @@ function load() {
 <h2>Voting Methods Exploration</h2>
 
 <hr/>
+<!--
 <h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
 Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <p/>
+-->
 
 <table width="100%" style="border: 0px;">
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
+Ballots:<br/>
 <textarea width="100%" id="ballots" rows="14" cols="30">
-[C B A=D]
-[A C B D]
-[B C A=D]
-[A=D C B]
-[D C=B A]
+C B A=D
+A C B D
+B C A=D
+A=D C B
+D C=B A
 </textarea>
 <!--
 [C B A=D]
@@ -883,6 +886,29 @@ D A B C
 </td>
 
 <td width="70%" valign="top" style="border: 0px;">
+&nbsp; Notes:</br>
+<ul>
+<li>Each line is one ballot cast by one voter.</li>
+<li>Candidate choices are separated by spaces.</li>
+<li>The first choice is listed first (on the left).<br/>
+      &nbsp; Simple example ballot: <b>b d a c</b></li>
+<li>Equal choices are expressed with "<b>=</b>".<br/>
+      &nbsp; Ballot with an equal choice: <b>b d=a c</b></li>
+<li>Numeric values are given inside brackets.<br/>
+      &nbsp; Ballot with numeric values: <b>b[95] d[70] a[70] c[5]</b></li>
+</ul>
+
+<br/>
+
+&nbsp; &nbsp; <select id="example" onchange="change_example()">
+<option value="examples">Examples</option>
+<option value="rock_paper_scissors">Rock Paper Scissors</option>
+</select>
+
+<input type="button" name="load_ex" value="Load Example" onclick="load_example()"></input>
+
+
+<!-- Notes for "new" style:
 <ul>
 <li>Each ballot is enclosed in a set of square brackets.</li>
 <li>Choices are listed in the brackets separated by spaces.</li>
@@ -893,24 +919,25 @@ D A B C
 <li>Numeric values are expressed inside parentheses.<br/>
       Ballot with numeric values: [ b(100) d(70) a(70) c(10) ]</li>
 </ul>
+-->
 </td>
 
 </tr>
 </table>
 
 <p/>
+</center>
 
-<select id="mode" onchange="change_methods()">
+&nbsp; <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
 <option value="range_mode">Range</option>
 <option value="instant_runoff_mode">Instant Runoff</option>
 <option value="condorcet_mode">Condorcet</option>
 </select>
 
-<input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
+&nbsp; <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
 
 <hr/>
-</center>
 
 <div id="results"></div>
 
