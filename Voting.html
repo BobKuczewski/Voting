@@ -858,19 +858,19 @@ function load_example() {
   let example_sel = document.getElementById ( "example" );
 
   if (document.getElementById("example").value == "examples") {
-    ballot_area.textContent =
+    ballot_area.value =
       "C B A=D\n" +
       "A C B D\n" +
       "B C A=D\n" +
       "A=D C B\n" +
       "D C=B A\n";
   } else if (document.getElementById("example").value == "rock_paper_scissors") {
-    ballot_area.textContent =
+    ballot_area.value =
       "a b c\n" +
       "b c a\n" +
       "c a b\n";
   } else if (document.getElementById("example").value == "concensus") {
-    ballot_area.textContent =
+    ballot_area.value =
       "a b c d e f g\n" +
       "b a c d e f g\n" +
       "b a c d e f g\n" +
