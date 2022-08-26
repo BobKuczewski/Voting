@@ -754,10 +754,11 @@ function condorcet ( ballot_text ) {
 
 function calc_results() {
 
-  ballot_area = document.getElementById ( "ballots" );
+  let ballot_area = document.getElementById ( "ballots" );
 
-  result_area = document.getElementById ( "results" );
-  ballot_text = ballot_area.value;
+  let result_area = document.getElementById ( "results" );
+  let ballot_text = ballot_area.value;
+  let results = "";
 
   if (document.getElementById("mode").value == "plurality_mode") {
     results = simple_plurality ( ballot_text );
@@ -776,6 +777,44 @@ function calc_results() {
 }
 
 function change_methods() {
+}
+
+function change_example() {
+}
+
+function load_example() {
+  let ballot_area = document.getElementById ( "ballots" );
+  let example_sel = document.getElementById ( "example" );
+
+  if (document.getElementById("example").value == "examples") {
+    ballot_area.textContent =
+      "C B A=D\n" +
+      "A C B D\n" +
+      "B C A=D\n" +
+      "A=D C B\n" +
+      "D C=B A\n";
+  } else if (document.getElementById("example").value == "rock_paper_scissors") {
+    ballot_area.textContent =
+      "a b c\n" +
+      "b c a\n" +
+      "c a b\n";
+  } else if (document.getElementById("example").value == "concensus") {
+    ballot_area.textContent =
+      "a b c d e f g\n" +
+      "b a c d e f g\n" +
+      "b a c d e f g\n" +
+      "c a b d e f g\n" +
+      "c a b d e f g\n" +
+      "d a b c e f g\n" +
+      "d a b c e f g\n" +
+      "e a b c d f g\n" +
+      "e a b c d f g\n" +
+      "f a b c d e g\n" +
+      "f a b c d e g\n" +
+      "g a b c d e f\n" +
+      "g a b c d e f\n" +
+      "g a b c d e f\n";
+  }
 }
 
 function load() {
@@ -903,9 +942,10 @@ D A B C
 &nbsp; &nbsp; <select id="example" onchange="change_example()">
 <option value="examples">Examples</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
+<option value="concensus">Hidden Concensus</option>
 </select>
 
-<input type="button" name="load_ex" value="Load Example" onclick="load_example()"></input>
+<input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
 
 
 <!-- Notes for "new" style:
