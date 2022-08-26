@@ -863,12 +863,34 @@ function load_example() {
       "A C B D\n" +
       "B C A=D\n" +
       "A=D C B\n" +
-      "D C=B A\n";
+      "D C=B A\n" ;
+
   } else if (document.getElementById("example").value == "rock_paper_scissors") {
     ballot_area.value =
       "a b c\n" +
       "b c a\n" +
-      "c a b\n";
+      "c a b\n" ;
+
+  } else if (document.getElementById("example").value == "old_condorcet") {
+    ballot_area.value =
+      "C B A=D\n" +
+      "A C B D\n" +
+      "B C A=D\n" +
+      "A=D C B\n" +
+      "D C B A\n" +
+      "B C A=D\n" +
+      "B C D=A\n" ;
+
+  } else if (document.getElementById("example").value == "old_amimation_2013") {
+    ballot_area.value =
+      "A C B D\n" +
+      "B A C D\n" +
+      "B A D C\n" +
+      "C B D A\n" +
+      "C A B D\n" +
+      "D A C B\n" +
+      "D A B C\n" ;
+
   } else if (document.getElementById("example").value == "concensus") {
     ballot_area.value =
       "a b c d e f g\n" +
@@ -884,7 +906,240 @@ function load_example() {
       "f a b c d e g\n" +
       "g a b c d e f\n" +
       "g a b c d e f\n" +
-      "g a b c d e f\n";
+      "g a b c d e f\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple") {
+    ballot_area.value =
+      "C B A D\n" +
+      "A C B D\n" +
+      "B C A D\n" +
+      "A D C B\n" +
+      "D C B A\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple#") {
+    ballot_area.value =
+      "C[100] B[75] A[50] D[25]\n" +
+      "A[100] C[75] B[50] D[25]\n" +
+      "B[100] C[75] A[50] D[25]\n" +
+      "A[100] D[75] C[50] B[25]\n" +
+      "D[100] C[75] B[50] A[25]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple=") {
+    ballot_area.value =
+      "C B A=D\n" +
+      "A C B D\n" +
+      "B C A=D\n" +
+      "A=D C B\n" +
+      "D C=B A\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple=#") {
+    ballot_area.value =
+      "C[100] B[75] A[30] D[30]\n" +
+      "A[100] C[75] B[50] D[25]\n" +
+      "B[100] C[75] A[30] D[30]\n" +
+      "A[85] D[85] C[50] B[25]\n"  +
+      "D[100] C[60] B[60] A[25]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple_Ties") {
+    ballot_area.value =
+      "C[100] B[80] A[50] D[10]\n" +
+      "A[100] C[75] B[30] D[30]\n" +
+      "B[100] C[75] A[50] D[25]\n" +
+      "A[100] D[75] C[75] B[25]\n" +
+      "D[90] C[50] B[20] A[20]\n"  ;
+
+  } else if (document.getElementById("example").value == "Java_Simple_BackWard") {
+    ballot_area.value =
+      "D[25] A[50] B[75] C[99]\n" +
+      "D[50] B[50] C[75] A[99]\n" +
+      "D[25] A[50] C[75] B[99]\n" +
+      "B[25] C[50] D[75] A[99]\n" +
+      "A[25] B[50] C[75] D[99]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Simple_UpSideDown") {
+    ballot_area.value =
+      "D[100] C[75] B[50] A[25]\n" +
+      "A[100] D[75] C[50] B[25]\n" +
+      "B[100] C[75] A[50] D[25]\n" +
+      "A[100] C[75] B[50] D[25]\n" +
+      "C[100] B[75] A[50] D[25]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_XYZ") {
+    ballot_area.value =
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "X[30] Y[20] Z[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Z[30] Y[20] X[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] X[20] Z[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" +
+      "Y[30] Z[20] X[10]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Schwartz") {
+    ballot_area.value =
+      "A[4] C[3] D[2] B[1]\n" +
+      "A[4] C[3] D[2] B[1]\n" +
+      "A[4] C[3] D[2] B[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "B[4] A[3] C[2] D[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "C[4] D[3] A[2] B[1]\n" +
+      "D[4] A[3] B[2] C[1]\n" +
+      "D[4] A[3] B[2] C[1]\n" +
+      "D[4] A[3] B[2] C[1]\n" +
+      "D[4] A[3] B[2] C[1]\n" +
+      "D[4] A[3] B[2] C[1]\n" +
+      "D[4] B[3] C[2] A[1]\n" +
+      "D[4] B[3] C[2] A[1]\n" +
+      "D[4] B[3] C[2] A[1]\n" +
+      "D[4] B[3] C[2] A[1]\n" +
+      "D[4] B[3] C[2] A[1]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_StrongSecond1") {
+    ballot_area.value =
+      "A[5] X[4] Y[3] Z[2] Q[1]\n" +
+      "B[5] A[4] X[3] Y[2] Z[1]\n" +
+      "B[5] A[4] L[3] M[2] N[1]\n" +
+      "C[5] A[4] N[3] Z[2] Q[1]\n" +
+      "C[5] A[4] I[3] J[2] K[1]\n" +
+      "D[5] A[4] R[3] S[2] T[1]\n" +
+      "D[5] A[4] L[3] M[2] P[1]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_StrongSecond2") {
+    ballot_area.value =
+      "A[9] B[4] C[3] D[2]\n" +
+      "B[9] A[4] D[3] C[2]\n" +
+      "B[9] A[4] D[3] C[2]\n" +
+      "C[9] A[4] B[3] D[2]\n" +
+      "C[9] A[4] B[3] D[2]\n" +
+      "D[9] A[4] B[3] C[2]\n" +
+      "D[9] A[4] B[3] C[2]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_Transition_Team") {
+    ballot_area.value =
+      "A[4] C[3] D[2] B[1]\n" +
+      "B[4] D[3] C[2] A[1]\n" +
+      "D[4] B[3] A[2] C[1]\n" +
+      "C[4] A[3] D[2] B[1]\n" +
+      "B[4] D[3] C[2] A[1]\n" +
+      "D[4] B[3] A[2] C[1]\n" +
+      "A[4] C[3] B[2] D[1]\n" +
+      "D[4] C[3] B[2] A[1]\n" +
+      "A[4] B[3] C[2] D[1]\n" +
+      "C[4] D[3] B[2] A[1]\n" +
+      "A[4] C[3] B[2] D[1]\n" +
+      "C[4] A[3] D[2] B[1]\n" +
+      "B[4] D[3] C[2] A[1]\n" +
+      "D[4] B[3] A[2] C[1]\n" +
+      "C[4] D[3] B[2] A[1]\n" +
+      "A[4] C[3] B[2] D[1]\n" +
+      "C[4] D[3] B[2] A[1]\n" ;
+
   }
 }
 
@@ -1015,6 +1270,21 @@ D A B C
 <option value="examples">Examples</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
 <option value="concensus">Hidden Concensus</option>
+<option value="old_condorcet">2010 Condorcet</option>
+<option value="old_amimation_2013">2013 Animation</option>
+<option value="Java_Simple">Java Simple</option>
+<option value="Java_Simple#">Java #</option>
+<option value="Java_Simple=">Java =</option>
+<option value="Java_Simple=#">Java =#</option>
+<option value="Java_Simple_Ties">Java Ties</option>
+<option value="Java_Simple_BackWard">Java Backward</option>
+<option value="Java_Simple_UpSideDown">Java Up Side Down</option>
+<option value="Java_XYZ">Java XYZ</option>
+<option value="Java_Schwartz">Java Schwartz</option>
+<option value="Java_StrongSecond1">Java Strong 2nd 1</option>
+<option value="Java_StrongSecond2">Java Strong 2nd 2</option>
+<option value="Java_Transition_Team">Java Transition Team</option>
+
 </select>
 
 <input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
