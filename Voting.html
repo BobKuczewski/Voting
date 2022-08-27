@@ -2,6 +2,7 @@
 
 <head>
 <title>Voting Methods Exploration</title>
+<meta charset="utf-8"/>
 <style>
   table, tr, th, td {
     border: 1px solid black;
@@ -357,7 +358,7 @@ function simple_plurality ( ballot_text ) {
     machine[b.choices[0].cand_name] += 1;
   }
 
-  let result = "<b>Simple Plurality &nbsp; </b> (only the first choice matters):<br/>\n";
+  let result = "<b>Simple Plurality &nbsp; </b> (only first choice matters, equals are ignored):<br/>\n";
 
   result += "Total votes cast: <b>" + bb.ballots.length + "</b><br/>\n";
 
@@ -380,13 +381,11 @@ function simple_plurality ( ballot_text ) {
     }
   }
   if (highest_candidates.length == 1) {
-    result = result + " --&gt; Candidate <b>" + highest_candidates[0] + "</b> won!";
+    result += " --&gt; Simple Plurality Winner is: <b>" + highest_candidates[0] + "</b><br/>";
   } else if (highest_candidates.length > 1) {
-    for (i=0; i<highest_candidates.length; i++) {
-      result = result + " --&gt; Candidate <b>" + highest_candidates[i] + "</b> tied for the win.<br/>";
-    }
+    result += "--&gt; Simple Plurality Winners are: <b>" + highest_candidates + "</b>";
   } else {
-    result = result + "No Candidates Found.";
+    result += "No Candidates Found.";
   }
 
   return ( result );
@@ -397,26 +396,30 @@ function range_voting ( ballot_text ) {
 
   /* let */ bb = new BallotBox ( ballot_text );
 
-  let result = "<b>Range Voting &nbsp; </b> (sum of scores matters):<br/>\n";
+  let result = "<b>Range Voting &nbsp; </b> (uses sum of scores):<br/>\n";
 
   let machine = {};
   for (let i=0; i<bb.cand_list.length; i++) {
     machine[bb.cand_list[i]] = 0;
   }
+  let found_all = true;
   let found_one = false;
   for (let bi=0; bi<bb.ballots.length; bi++) {
     let b = bb.ballots[bi];
     for (let ci=0; ci<b.choices.length; ci++) {
-      if (b.choices[ci].value != null) {
-        machine[b.choices[ci].cand_name] += b.choices[ci].value;
+      machine[b.choices[ci].cand_name] += b.choices[ci].rank;
+      if (b.choices[ci].value == null) {
+        found_all = false;
+      } else {
         found_one = true;
       }
     }
   }
 
   if (found_one == false) {
-    result += "Range voting requires at least one score, but none were given.<br/>\n";
+    result += "<i>Range voting needs a score for every candidate, but none were given.<br/>\n";
     result += "Automatic scores were generated based on simple ordering.<br/>\n";
+    result += "For proper functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
     machine = {};
     for (let i=0; i<bb.cand_list.length; i++) {
       machine[bb.cand_list[i]] = 0;
@@ -428,6 +431,10 @@ function range_voting ( ballot_text ) {
         machine[b.choices[ci].cand_name] += b.choices[ci].value;
       }
     }
+  } else if ((found_one == true) && (found_all == false)) {
+    result += "<i>Range voting needs a score for every candidate, but some were missing.<br/>\n";
+    result += "Automatic scores were generated but they may be inconsistent with manual scores.<br/>\n";
+    result += "For proper functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
   }
 
   let max_val = -1;
@@ -448,9 +455,9 @@ function range_voting ( ballot_text ) {
   }
 
   if (winners.length <= 1) {
-    result += "--&gt; Winner is <b>" + winners + "</b>";
+    result += "--&gt; Range Winner is: <b>" + winners + "</b>";
   } else {
-    result += "--&gt; Winners are: <b>" + winners + "</b>";
+    result += "--&gt; Range Winners are: <b>" + winners + "</b>";
   }
 
   return ( result );
@@ -461,7 +468,7 @@ function instant_runoff ( ballot_text ) {
 
   /* let */ bb = new BallotBox ( ballot_text );
 
-  let result = "<b>Instant Runoff Voting &nbsp; </b> (early plurality matters):<br/>\n";
+  let result = "<b>Instant Runoff Voting &nbsp; </b> (evaluate and replace, equals ignored):<br/>\n";
 
   // Build a list of ballots made up of lists of candidate names
   let ballot_list = [];
@@ -479,8 +486,14 @@ function instant_runoff ( ballot_text ) {
     remaining_cand_list.push ( bb.cand_list[i] );
   }
 
+  round_num = 0;
   winner = null;
   while (winner == null) {
+
+    round_num += 1;
+    result += "&nbsp; Round:" + round_num + "<br/>";
+
+    // result += bb.print_to_string() + "<br/>";
 
     // See if there is a majority winner among the first choices
     // Also keep track of the loser among the first choices
@@ -539,7 +552,7 @@ function instant_runoff ( ballot_text ) {
 
       // Eliminate the lowest candidate(s) from remaining_cand_list
       if (lowest_candidates.length > 1) {
-        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b> (random)<br/>";
+        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b> (chosen at random among those with fewest votes)<br/>";
       } else {
         result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[0] + "</b><br/>";
       }
@@ -567,9 +580,9 @@ function instant_runoff ( ballot_text ) {
   }
 
   if (winner.length <= 1) {
-    result += "--&gt; Winner is <b>" + winner + "</b>";
+    result += "--&gt; Instant Runoff Winner is: <b>" + winner + "</b>";
   } else {
-    result += "--&gt; Winners are: <b>" + winner + "</b>";
+    result += "--&gt; Instant Runoff Winners are: <b>" + winner + "</b>";
   }
 
   return ( result );
@@ -640,10 +653,10 @@ function condorcet ( ballot_text ) {
   }
 
   if (winner == null) {
-    result = result + "<b>No Condorcet Winner.<br/>\n";
+    result += "<b>No Condorcet Winner.<br/>\n";
   } else {
 
-    result = result + "<b>The Condorcet Winner is &nbsp; " + winner + "\n";
+    result += "<b>The Condorcet Winner is: &nbsp; " + winner + "\n";
 
   }
 
@@ -715,10 +728,17 @@ function condorcet ( ballot_text ) {
     result += "<td valign=\"top\" style=\"border: 0px;\">\n";
     result += "<table>\n";
     result += "<tr><th colspan=\"" + max_choices + "\"><b>" + "Ballots" + "</b></th></tr>\n";
-    for (let r=0; r<5; r++) {
+    for (let r=0; r<bb.ballots.length; r++) {
       result += "<tr>\n";
       for (let c=0; c<max_choices; c++) {
-        result += "<td>A</td>\n";
+        let cand = "&nbsp;";
+        if (c < bb.ballots[r].choices.length) {
+          cand = bb.ballots[r].choices[c].cand_name;
+          if (bb.ballots[r].choices[c].equals) {
+            cand = "=" + cand;
+          }
+        }
+        result += "<td>" + cand + "</td>\n";
       }
       result += "</tr>\n";
     }
@@ -747,11 +767,11 @@ function condorcet ( ballot_text ) {
             if ( c[ci].cand_name == loser  ) loser_index = ci;
           }
           if ( (winner_index < 0) && (loser_index < 0) ) {
-            result += "<tr><td>?</td><td>?</td></tr>\n";
+            result += "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
           } else if (loser_index < 0) {
-            result += "<tr><td>" + c[winner_index].cand_name + "</td><td> </td></tr>\n";
+            result += "<tr><td>" + c[winner_index].cand_name + "</td><td>&nbsp;</td></tr>\n";
           } else if (winner_index < 0) {
-            result += "<tr><td> </td><td>" + c[loser_index].cand_name + "</td></tr>\n";
+            result += "<tr><td>&nbsp;</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
           } else if (c[winner_index].rank == c[loser_index].rank) {
             result += "<tr><td>=</td><td>=</td></tr>\n";
           } else if (c[winner_index].rank > c[loser_index].rank) {
@@ -984,8 +1004,9 @@ D A B C
       &nbsp; Simple example ballot: <b>b d a c</b></li>
 <li>Equal choices are expressed with "<b>=</b>".<br/>
       &nbsp; Ballot with an equal choice: <b>b d=a c</b></li>
-<li>Numeric values are given inside brackets.<br/>
-      &nbsp; Ballot with numeric values: <b>b[95] d[70] a[70] c[5]</b></li>
+<li>Numeric scores may be entered inside brackets.<br/>
+      &nbsp; Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></li>
+<li>Voting methods use ordering and scores differently.</li>
 </ul>
 
 <br/>
