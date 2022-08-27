@@ -1068,6 +1068,15 @@ function load_example() {
       "Y[30] Z[20] X[10]\n" ;
 
   } else if (document.getElementById("example").value == "Java_Schwartz") {
+    // A loses to D (12 to 18)
+    // B loses to A (14 to 16)
+    // B loses to D ( 9 to 21)
+    // C loses to A (13 to 17)
+    // C loses to B (11 to 19)
+    // D loses to C (10 to 20)
+    // So everyone loses to someone.
+    // Therefore, there are none who defeat all others.
+    // That means there is no Condorcet winner.
     ballot_area.value =
       "A[4] C[3] D[2] B[1]\n" +
       "A[4] C[3] D[2] B[1]\n" +
