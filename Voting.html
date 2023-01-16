@@ -84,75 +84,79 @@ class Ballot {
     // Parse one ballot (optionally surrounded by [])
     console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
-      this.choices = [];
-      let in_value = false;
-      let in_equals = false;
-      let in_name = false;
-      let name = '';
-      let value = null;
-      let i = 0;
-      let this_choice = null;
-      while (i < this.s.length) {
-        if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
-          // Found a space or insignificant character
-          i++;
-        } else if (this.s[i] == '(') {
-          // Found start of rank
-          in_value = true;
-          i++;
-        } else if (this.s[i] == ')') {
-          // Found end of rank
-          in_value = false;
-          i++;
-        } else if (this.s[i] == '=') {
-          // Found an equals
-          in_equals = true;
-          i++;
-        } else {
-          // Found some other character
-          if (in_value) {
-            // This should be the start of a number
-            let start = i;
-            while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
-              i++;
-            }
-            value = Number(this.s.substring(start,i));
-            if (this_choice == null) {
-              this_choice = new Choice ( name );
-            }
-            this_choice.value = value;
-            this.choices.push ( this_choice );
-            this_choice = null;
-            name = '';
-            value = null;
+      if (this.s.trim().length > 0) {
+
+        this.choices = [];
+        let in_value = false;
+        let in_equals = false;
+        let in_name = false;
+        let name = '';
+        let value = null;
+        let i = 0;
+        let this_choice = null;
+        while (i < this.s.length) {
+          if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
+            // Found a space or insignificant character
+            i++;
+          } else if (this.s[i] == '(') {
+            // Found start of rank
+            in_value = true;
+            i++;
+          } else if (this.s[i] == ')') {
+            // Found end of rank
             in_value = false;
+            i++;
+          } else if (this.s[i] == '=') {
+            // Found an equals
+            in_equals = true;
+            i++;
           } else {
-            // This should be the start of a new name
-            if (this_choice != null) {
+            // Found some other character
+            if (in_value) {
+              // This should be the start of a number
+              let start = i;
+              while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
+                i++;
+              }
+              value = Number(this.s.substring(start,i));
+              if (this_choice == null) {
+                this_choice = new Choice ( name );
+              }
+              this_choice.value = value;
               this.choices.push ( this_choice );
               this_choice = null;
               name = '';
               value = null;
-            }
-            let start = i;
-            while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
-              i++;
-            }
-            name = this.s.substring(start,i);
-            this_choice = new Choice(name);
-            if (in_equals) {
-              this_choice.equals = true;
-              in_equals = false;
+              in_value = false;
+            } else {
+              // This should be the start of a new name
+              if (this_choice != null) {
+                this.choices.push ( this_choice );
+                this_choice = null;
+                name = '';
+                value = null;
+              }
+              let start = i;
+              while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
+                i++;
+              }
+              name = this.s.substring(start,i);
+              this_choice = new Choice(name);
+              if (in_equals) {
+                this_choice.equals = true;
+                in_equals = false;
+              }
             }
           }
         }
+        if (this_choice != null) {
+          this.choices.push ( this_choice );
+          this_choice = null;
+        }
+        this.adjust_ranks();
       }
-      if (this_choice != null) {
-        this.choices.push ( this_choice );
-        this_choice = null;
-      }
-      this.adjust_ranks();
     }
+    console.log ( "Parse Ballot finished" );
   }
 
   add(name, value=null) {
@@ -287,7 +291,7 @@ class BallotBox {
       }
       this.build_cand_list()
     }
-    console.log ( this.print_to_string() );
+    // console.log ( this.print_to_string() );
   }
 
   print_to_string() {
@@ -344,7 +348,7 @@ bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 bb = null;
 
 function simple_plurality ( ballot_text ) {
-  console.log ( "Running Plurality" );
+  // console.log ( "Running Plurality" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -381,9 +385,9 @@ function simple_plurality ( ballot_text ) {
     }
   }
   if (highest_candidates.length == 1) {
-    result += " --&gt; Simple Plurality Winner is: <b>" + highest_candidates[0] + "</b><br/>";
+    result += " --&gt; Simple Plurality Winner is: <b><span id=\"winner\">" + highest_candidates[0] + "</span></b><br/>";
   } else if (highest_candidates.length > 1) {
-    result += "--&gt; Simple Plurality Winners are: <b>" + highest_candidates + "</b>";
+    result += "--&gt; Simple Plurality Winners are: <b><span id=\"winner\">" + highest_candidates + "</span></b>";
   } else {
     result += "No Candidates Found.";
   }
@@ -392,7 +396,7 @@ function simple_plurality ( ballot_text ) {
 }
 
 function range_voting ( ballot_text ) {
-  console.log ( "Running Range" );
+  // console.log ( "Running Range" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -455,16 +459,16 @@ function range_voting ( ballot_text ) {
   }
 
   if (winners.length <= 1) {
-    result += "--&gt; Range Winner is: <b>" + winners + "</b>";
+    result += "--&gt; Range Winner is: <b><span id=\"winner\">" + winners + "</span></b>";
   } else {
-    result += "--&gt; Range Winners are: <b>" + winners + "</b>";
+    result += "--&gt; Range Winners are: <b><span id=\"winner\">" + winners + "</span></b>";
   }
 
   return ( result );
 }
 
 function instant_runoff ( ballot_text ) {
-  console.log ( "Running Instant Runoff" );
+  // console.log ( "Running Instant Runoff" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -580,9 +584,9 @@ function instant_runoff ( ballot_text ) {
   }
 
   if (winner.length <= 1) {
-    result += "--&gt; Instant Runoff Winner is: <b>" + winner + "</b>";
+    result += "--&gt; Instant Runoff Winner is: <b><span id=\"winner\">" + winner + "</span></b>";
   } else {
-    result += "--&gt; Instant Runoff Winners are: <b>" + winner + "</b>";
+    result += "--&gt; Instant Runoff Winners are: <b><span id=\"winner\">" + winner + "</span></b>";
   }
 
   return ( result );
@@ -593,7 +597,7 @@ function condorcet ( ballot_text ) {
   // There can only be (at most) one Condorcet winner because two winners would imply that they beat each other
   // However, there may be conditions where no one candidate can beat all others meaning that there is no Condorcet Winner
 
-  console.log ( "Running Condorcet" );
+  // console.log ( "Running Condorcet" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -656,7 +660,7 @@ function condorcet ( ballot_text ) {
     result += "<b>No Condorcet Winner.<br/>\n";
   } else {
 
-    result += "<b>The Condorcet Winner is: &nbsp; " + winner + "\n";
+    result += "<b>The Condorcet Winner is: &nbsp; <span id=\"winner\">" + winner + "</span>\n";
 
   }
 
@@ -823,28 +827,89 @@ function condorcet ( ballot_text ) {
   return ( result );
 }
 
+function find_winner_in_results (results) {
+  // Winner(s) will be surrounded with: <span id="winner">W</span>
+  let wtag = '<span id="winner">';
+  let wstart = results.substring ( results.indexOf(wtag) + wtag.length );
+  let winner = wstart.substring(0, wstart.indexOf('</span>'));
+  // console.log ( "Winner is \"" + winner + "\"" );
+  return ( winner );
+}
+
 function calc_results() {
 
   let ballot_area = document.getElementById ( "ballots" );
 
   let result_area = document.getElementById ( "results" );
   let ballot_text = ballot_area.value;
-  let results = "";
+  if (ballot_text.length <= 0) {
+    // Generate some testing results
+    let ballot_text =
+          "A[9] B[4] C[3] D[2]\n" +
+          "B[9] A[4] D[3] C[2]\n" +
+          "B[9] A[4] D[3] C[2]\n" +
+          "C[9] A[4] B[3] D[2]\n" +
+          "C[9] A[4] B[3] D[2]\n" +
+          "D[9] A[4] B[3] C[2]\n" +
+          "D[9] A[4] B[3] C[2]\n" +
+          "D[9] A[4] B[3] C[2]\n" ;
 
-  if (document.getElementById("mode").value == "plurality_mode") {
+    let results = "";
+
     results = simple_plurality ( ballot_text );
-  } else if (document.getElementById("mode").value == "range_mode") {
+    console.log ( "Plurality Test: " + find_winner_in_results(results) );
     results = range_voting ( ballot_text );
-  } else if (document.getElementById("mode").value == "instant_runoff_mode") {
+    console.log ( "Range Test:" + find_winner_in_results(results) );
     results = instant_runoff ( ballot_text );
-  } else if (document.getElementById("mode").value == "condorcet_mode") {
+    console.log ( "Instant Runoff Test: " + find_winner_in_results(results) );
     results = condorcet ( ballot_text );
+    console.log ( "Condorcet Test: " + find_winner_in_results(results) );
+
+    // 100 samples of 4 candidates with 8 voters with range values 0 to 10
+    let num_samples = 1;
+    let num_candidates = 4;
+    let num_voters = 8;
+    let max_range = 9.5;
+
+    let num_plurality_ties = 0;
+    let num_range_ties = 0;
+    let num_runoff_ties = 0;
+    let num_condorcet_ties = 0;
+    ballot_text = "";
+    for (let casenum=0; casenum<1; casenum++) {
+      for (let v=0; v<num_voters; v++) {
+        let vb = "";
+        for (let c=0; c<num_candidates; c++) {
+          // vb += "c" + c + "[" + Math.round(Math.random() * max_range) + "] ";
+          vb += Math.round(Math.random() * max_range) + "," + c;
+        }
+        ballot_text += vb.split(' ').sort().reverse().join(' ') + "\n";
+      }
+      console.log ( ballot_text );
+      console.log ( "Pl: " + find_winner_in_results(simple_plurality ( ballot_text )) );
+      console.log ( "Rg: " + find_winner_in_results(range_voting ( ballot_text )) );
+      console.log ( "IR: " + find_winner_in_results(instant_runoff ( ballot_text )) );
+      console.log ( "Ct: " + find_winner_in_results(condorcet ( ballot_text )) );
+    }
+
   } else {
-    results = "Mode not recognized.";
+    // Generate a normal result
+    let results = "";
+
+    if (document.getElementById("mode").value == "plurality_mode") {
+      results = simple_plurality ( ballot_text );
+    } else if (document.getElementById("mode").value == "range_mode") {
+      results = range_voting ( ballot_text );
+    } else if (document.getElementById("mode").value == "instant_runoff_mode") {
+      results = instant_runoff ( ballot_text );
+    } else if (document.getElementById("mode").value == "condorcet_mode") {
+      results = condorcet ( ballot_text );
+    } else {
+      results = "Mode not recognized.";
+    }
+
+    result_area.innerHTML = "<p>" + results + "</p>";
   }
-
-  result_area.innerHTML = "<p>" + results + "</p>";
-
 }
 
 function change_methods() {
