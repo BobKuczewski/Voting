@@ -973,6 +973,19 @@ function load_example() {
       "g a b c d e f\n" +
       "g a b c d e f\n" ;
 
+  } else if (document.getElementById("example").value == "Ban_Scott") {
+    ballot_area.value =
+      "Y[100] N[0]\n" +
+      "Y[100] N[0]\n" +
+      "Y[100] N[0]\n" +
+      "Y[100] N[0]\n" +
+      "Y[100] N[0]\n" +
+      "Y[50] N[100]\n" +
+      "Y[0] N[1]\n" +
+      "Y[1] N[100]\n" +
+      "Y[1] N[100]\n" +
+      "Y[0] N[100]\n" +
+      "Y[0] N[100]\n" ;
   } else if (document.getElementById("example").value == "Java_Simple") {
     ballot_area.value =
       "C B A D\n" +
@@ -1346,6 +1359,7 @@ D A B C
 <option value="concensus">Hidden Concensus</option>
 <option value="old_condorcet">2010 Condorcet</option>
 <option value="old_amimation_2013">2013 Animation</option>
+<option value="Ban_Scott">Ban Scott from HGAA</option>
 <option value="Java_Simple">Java Simple</option>
 <option value="Java_Simple#">Java #</option>
 <option value="Java_Simple=">Java =</option>
