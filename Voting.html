@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>Voting Methods Exploration</title>
+<title>Voting Methods Exploration Version 22</title>
 <meta charset="utf-8"/>
 <style>
   table, tr, th, td {
@@ -275,6 +275,17 @@ class BallotBox {
       if (this.s.trim()[0] != '[') {
         // Format 1: Ballots separated by newline, range values in []
         let blist = s.split('\n');
+        // Remove // Comments:
+        for (let i=0; i<blist.length; i++) {
+          let comment_index = blist[i].indexOf('/');
+          if (comment_index >= 0) {
+            blist[i] = blist[i].substr(0,comment_index);
+          }
+          comment_index = blist[i].indexOf('#');
+          if (comment_index >= 0) {
+            blist[i] = blist[i].substr(0,comment_index);
+          }
+        }
         for (let i=0; i<blist.length; i++) {
           if (blist[i].trim().length > 0) {
             this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
@@ -975,17 +986,17 @@ function load_example() {
 
   } else if (document.getElementById("example").value == "Ban_Scott") {
     ballot_area.value =
-      "Y[100] N[0]\n" +
-      "Y[100] N[0]\n" +
-      "Y[100] N[0]\n" +
-      "Y[100] N[0]\n" +
-      "Y[100] N[0]\n" +
-      "Y[50] N[100]\n" +
-      "Y[0] N[1]\n" +
-      "Y[1] N[100]\n" +
-      "Y[1] N[100]\n" +
-      "Y[0] N[100]\n" +
-      "Y[0] N[100]\n" ;
+      "Y[100] N[0]  // KK\n" +
+      "Y[100] N[0]  // JB\n" +
+      "Y[100] N[0]  // SG\n" +
+      "Y[100] N[0]  // Dan\n" +
+      "Y[100] N[50] // Jason\n" +
+      "N[100] Y[50] // HGXC\n" +
+      "N[1]   Y[0]  // Scare\n" +
+      "N[100] Y[1]  // HGAAflyer\n" +
+      "N[100] Y[1]  // PilotGuy\n" +
+      "N[100] Y[0]  // SkyPilot\n" +
+      "N[100] Y[0]  // Bob\n" ;
   } else if (document.getElementById("example").value == "Java_Simple") {
     ballot_area.value =
       "C B A D\n" +
@@ -1250,7 +1261,7 @@ Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 Ballots:<br/>
-<textarea width="100%" id="ballots" rows="14" cols="30">
+<textarea width="100%" id="ballots" rows="16" cols="32">
 C B A=D
 A C B D
 B C A=D
@@ -1338,17 +1349,19 @@ D A B C
 </td>
 
 <td width="70%" valign="top" style="border: 0px;">
-&nbsp; Notes:</br>
+&nbsp; Notes for Version 22:</br>
 <ul>
 <li>Each line is one ballot cast by one voter.</li>
 <li>Candidate choices are separated by spaces.</li>
 <li>The first choice is listed first (on the left).<br/>
-      &nbsp; Simple example ballot: <b>b d a c</b></li>
+      &nbsp; Simple example ballot with "b" first: <b>b d a c</b></li>
 <li>Equal choices are expressed with "<b>=</b>".<br/>
       &nbsp; Ballot with an equal choice: <b>b d=a c</b></li>
 <li>Numeric scores may be entered inside brackets.<br/>
       &nbsp; Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></li>
+      &nbsp; Highest numbers must come first!</b></li>
 <li>Voting methods use ordering and scores differently.</li>
+<li>Comments may start with either # or / or // .</li>
 </ul>
 
 <br/>
