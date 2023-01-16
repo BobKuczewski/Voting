@@ -422,8 +422,8 @@ function range_voting ( ballot_text ) {
 
   if (found_one == false) {
     result += "<i>Range voting needs a score for every candidate, but none were given.<br/>\n";
-    result += "Automatic scores were generated based on simple ordering.<br/>\n";
-    result += "For proper functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
+    result += "Automatic non-Range scores were generated (from 1 up) based on simple ordering.<br/>\n";
+    result += "For proper Range functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
     machine = {};
     for (let i=0; i<bb.cand_list.length; i++) {
       machine[bb.cand_list[i]] = 0;
