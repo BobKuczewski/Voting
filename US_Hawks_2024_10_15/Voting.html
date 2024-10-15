@@ -1,16 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 1.0 Transitional//EN">
 <html>
 
 <head>
-<title>Voting Methods Exploration Version 23</title>
+<title>US Hawks Voting Methods Exploration</title>
 <meta charset="utf-8"/>
+
+<meta name="description" content="National Hang Gliding Association featuring both national and local hang glider and hang gliding discussion forums." />
+<meta name="keywords" content="hang gliding, hang gliding association, hang gliding forum, hang gliding club, flying, how to fly, learn to fly, soaring, gliding, hang gliding photos, videos, pilot, paragliding" />
+<meta name="classification" content="Sports,Hang Gliding" />
+<meta name="site content" content="Hang Gliding, hang gliding clubs, flying" />
+
+<link rel="stylesheet" type="text/css" href="def.css" />
+
 <style>
-  table, tr, th, td {
+  table {
+    margin-left: 20px;
+    border: 1px solid black;
+  }
+  tr, th, td {
     border: 1px solid black;
   }
   td, th {
     font-family: monospace;
     font-weight: bold;
-    font-size: 110%;
+    font-size: 100%;
     padding-top: 3px;
     padding-left: 5px;
     padding-right: 5px;
@@ -19,13 +32,139 @@
   th {
     font-family: monospace;
     font-weight: bold;
-    font-size: 120%;
+    font-size: 110%;
     padding-top: 4px;
     padding-left: 6px;
     padding-right: 6px;
     padding-bottom: 2px;
     background: #eea;
   }
+
+  /* HTML for the entire document or site */
+  html {
+    font-size: 15px;
+    font-family: verdana, helvetica, arial, sans-serif;
+	  background-image: url('board_bg.png');
+  }
+
+  html, body {
+	  color: #536482;
+	  background-color: #667183;
+	  background-image: url('board_bg.png');
+  }
+
+  /* Body for the entire document or site */
+  body {
+    /* background-color: #777777	; */  /* Web-Safe Light Blue is ccccff */
+    color: #000000;  /* Text Color - Web-Safe Dark Blue is 000066 */
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+	  background-image: url('board_bg.png');
+  }
+
+  .pagebody {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  /* Headings for the entire document or site */
+
+  h1 {
+    font-size: 150%;
+    font-weight: bold;
+    color: #000000;
+  }
+
+  h2 {
+    font-size: 130%;
+    font-weight: bold;
+    color: #000000;
+  }
+
+  h3 {
+    font-size: 110%;
+    font-weight: bold;
+    color: #000000;
+  }
+
+
+  /* Regular Text */
+
+  /* All paragraphs */
+  p {
+    margin-left: 20px;
+    text-indent: 0px;
+  }
+
+  /* All bold text */
+  b {
+    font-weight: bold;
+    font-size: 104%;
+  }
+
+  /* Links */
+  a:link {
+    text-decoration: none;
+    color: #381F15;
+    background-color: inherit;
+  }
+
+  a:visited {
+    text-decoration: none;
+    color: #78432D;
+    background-color: inherit;
+  }
+
+  a:hover {
+    color: #A65D3E;
+    background-color: inherit;
+  }
+
+  a:active {
+    text-decoration: none;
+    color: #C05600;
+    background-color: inherit;
+  }
+
+
+  /* Uses Classes */
+
+  pre {
+    font-size: 70%;
+    margin-left: 20px;
+  }
+
+  p.small {
+    font-size: 70%;
+  }
+
+  .inner {
+    background-image: url('header_bg.png');
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  .headerbar {
+	  background-image: url('xheader_bg.png');
+	  color: #FFFFFF;
+	  height: 122px;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+
+  .red {
+    color: #FF0000;
+  }
+  .grn {
+    color: #00FF00;
+  }
+  .blu {
+    color: #0000FF;
+  }
+
 </style>
 
 </head>
@@ -84,79 +223,75 @@ class Ballot {
     // Parse one ballot (optionally surrounded by [])
     console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
-      if (this.s.trim().length > 0) {
-
-        this.choices = [];
-        let in_value = false;
-        let in_equals = false;
-        let in_name = false;
-        let name = '';
-        let value = null;
-        let i = 0;
-        let this_choice = null;
-        while (i < this.s.length) {
-          if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
-            // Found a space or insignificant character
-            i++;
-          } else if (this.s[i] == '(') {
-            // Found start of rank
-            in_value = true;
-            i++;
-          } else if (this.s[i] == ')') {
-            // Found end of rank
+      this.choices = [];
+      let in_value = false;
+      let in_equals = false;
+      let in_name = false;
+      let name = '';
+      let value = null;
+      let i = 0;
+      let this_choice = null;
+      while (i < this.s.length) {
+        if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
+          // Found a space or insignificant character
+          i++;
+        } else if (this.s[i] == '(') {
+          // Found start of rank
+          in_value = true;
+          i++;
+        } else if (this.s[i] == ')') {
+          // Found end of rank
+          in_value = false;
+          i++;
+        } else if (this.s[i] == '=') {
+          // Found an equals
+          in_equals = true;
+          i++;
+        } else {
+          // Found some other character
+          if (in_value) {
+            // This should be the start of a number
+            let start = i;
+            while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
+              i++;
+            }
+            value = Number(this.s.substring(start,i));
+            if (this_choice == null) {
+              this_choice = new Choice ( name );
+            }
+            this_choice.value = value;
+            this.choices.push ( this_choice );
+            this_choice = null;
+            name = '';
+            value = null;
             in_value = false;
-            i++;
-          } else if (this.s[i] == '=') {
-            // Found an equals
-            in_equals = true;
-            i++;
           } else {
-            // Found some other character
-            if (in_value) {
-              // This should be the start of a number
-              let start = i;
-              while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
-                i++;
-              }
-              value = Number(this.s.substring(start,i));
-              if (this_choice == null) {
-                this_choice = new Choice ( name );
-              }
-              this_choice.value = value;
+            // This should be the start of a new name
+            if (this_choice != null) {
               this.choices.push ( this_choice );
               this_choice = null;
               name = '';
               value = null;
-              in_value = false;
-            } else {
-              // This should be the start of a new name
-              if (this_choice != null) {
-                this.choices.push ( this_choice );
-                this_choice = null;
-                name = '';
-                value = null;
-              }
-              let start = i;
-              while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
-                i++;
-              }
-              name = this.s.substring(start,i);
-              this_choice = new Choice(name);
-              if (in_equals) {
-                this_choice.equals = true;
-                in_equals = false;
-              }
+            }
+            let start = i;
+            while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
+              i++;
+            }
+            name = this.s.substring(start,i);
+            this_choice = new Choice(name);
+            if (in_equals) {
+              this_choice.equals = true;
+              in_equals = false;
             }
           }
         }
-        if (this_choice != null) {
-          this.choices.push ( this_choice );
-          this_choice = null;
-        }
-        this.adjust_ranks();
       }
+      if (this_choice != null) {
+        this.choices.push ( this_choice );
+        this_choice = null;
+      }
+      this.adjust_ranks();
     }
-    console.log ( "Parse Ballot finished" );
   }
 
   add(name, value=null) {
@@ -279,17 +414,6 @@ class BallotBox {
       if (this.s.trim()[0] != '[') {
         // Format 1: Ballots separated by newline, range values in []
         let blist = s.split('\n');
-        // Remove // Comments:
-        for (let i=0; i<blist.length; i++) {
-          let comment_index = blist[i].indexOf('/');
-          if (comment_index >= 0) {
-            blist[i] = blist[i].substr(0,comment_index);
-          }
-          comment_index = blist[i].indexOf('#');
-          if (comment_index >= 0) {
-            blist[i] = blist[i].substr(0,comment_index);
-          }
-        }
         for (let i=0; i<blist.length; i++) {
           if (blist[i].trim().length > 0) {
             this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
@@ -306,7 +430,7 @@ class BallotBox {
       }
       this.build_cand_list()
     }
-    // console.log ( this.print_to_string() );
+    console.log ( this.print_to_string() );
   }
 
   print_to_string() {
@@ -363,7 +487,7 @@ bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 bb = null;
 
 function simple_plurality ( ballot_text ) {
-  // console.log ( "Running Plurality" );
+  console.log ( "Running Plurality" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -400,9 +524,9 @@ function simple_plurality ( ballot_text ) {
     }
   }
   if (highest_candidates.length == 1) {
-    result += " --&gt; Simple Plurality Winner is: <b><span id=\"winner\">" + highest_candidates[0] + "</span></b><br/>";
+    result += " --&gt; Simple Plurality Winner is: <b>" + highest_candidates[0] + "</b><br/>";
   } else if (highest_candidates.length > 1) {
-    result += "--&gt; Simple Plurality Winners are: <b><span id=\"winner\">" + highest_candidates + "</span></b>";
+    result += "--&gt; Simple Plurality Winners are: <b>" + highest_candidates + "</b>";
   } else {
     result += "No Candidates Found.";
   }
@@ -411,7 +535,7 @@ function simple_plurality ( ballot_text ) {
 }
 
 function range_voting ( ballot_text ) {
-  // console.log ( "Running Range" );
+  console.log ( "Running Range" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -437,8 +561,8 @@ function range_voting ( ballot_text ) {
 
   if (found_one == false) {
     result += "<i>Range voting needs a score for every candidate, but none were given.<br/>\n";
-    result += "Automatic non-Range scores were generated (from 1 up) based on simple ordering.<br/>\n";
-    result += "For proper Range functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
+    result += "Automatic scores were generated based on simple ordering.<br/>\n";
+    result += "For proper functioning, enter a score for <u>every</u> candidate on <u>every</u> ballot.<br/></i>\n";
     machine = {};
     for (let i=0; i<bb.cand_list.length; i++) {
       machine[bb.cand_list[i]] = 0;
@@ -474,16 +598,16 @@ function range_voting ( ballot_text ) {
   }
 
   if (winners.length <= 1) {
-    result += "--&gt; Range Winner is: <b><span id=\"winner\">" + winners + "</span></b>";
+    result += "--&gt; Range Winner is: <b>" + winners + "</b>";
   } else {
-    result += "--&gt; Range Winners are: <b><span id=\"winner\">" + winners + "</span></b>";
+    result += "--&gt; Range Winners are: <b>" + winners + "</b>";
   }
 
   return ( result );
 }
 
 function instant_runoff ( ballot_text ) {
-  // console.log ( "Running Instant Runoff" );
+  console.log ( "Running Instant Runoff" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -599,9 +723,9 @@ function instant_runoff ( ballot_text ) {
   }
 
   if (winner.length <= 1) {
-    result += "--&gt; Instant Runoff Winner is: <b><span id=\"winner\">" + winner + "</span></b>";
+    result += "--&gt; Instant Runoff Winner is: <b>" + winner + "</b>";
   } else {
-    result += "--&gt; Instant Runoff Winners are: <b><span id=\"winner\">" + winner + "</span></b>";
+    result += "--&gt; Instant Runoff Winners are: <b>" + winner + "</b>";
   }
 
   return ( result );
@@ -612,7 +736,7 @@ function condorcet ( ballot_text ) {
   // There can only be (at most) one Condorcet winner because two winners would imply that they beat each other
   // However, there may be conditions where no one candidate can beat all others meaning that there is no Condorcet Winner
 
-  // console.log ( "Running Condorcet" );
+  console.log ( "Running Condorcet" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -675,7 +799,7 @@ function condorcet ( ballot_text ) {
     result += "<b>No Condorcet Winner.<br/>\n";
   } else {
 
-    result += "<b>The Condorcet Winner is: &nbsp; <span id=\"winner\">" + winner + "</span>\n";
+    result += "<b>The Condorcet Winner is: &nbsp; " + winner + "\n";
 
   }
 
@@ -842,89 +966,29 @@ function condorcet ( ballot_text ) {
   return ( result );
 }
 
-function find_winner_in_results (results) {
-  // Winner(s) will be surrounded with: <span id="winner">W</span>
-  let wtag = '<span id="winner">';
-  let wstart = results.substring ( results.indexOf(wtag) + wtag.length );
-  let winner = wstart.substring(0, wstart.indexOf('</span>'));
-  // console.log ( "Winner is \"" + winner + "\"" );
-  return ( winner );
-}
-
 function calc_results() {
 
   let ballot_area = document.getElementById ( "ballots" );
 
   let result_area = document.getElementById ( "results" );
   let ballot_text = ballot_area.value;
-  if (ballot_text.length <= 0) {
-    // Generate some testing results
-    let ballot_text =
-          "A[9] B[4] C[3] D[2]\n" +
-          "B[9] A[4] D[3] C[2]\n" +
-          "B[9] A[4] D[3] C[2]\n" +
-          "C[9] A[4] B[3] D[2]\n" +
-          "C[9] A[4] B[3] D[2]\n" +
-          "D[9] A[4] B[3] C[2]\n" +
-          "D[9] A[4] B[3] C[2]\n" +
-          "D[9] A[4] B[3] C[2]\n" ;
+  let results = "";
 
-    let results = "";
-
+  if (document.getElementById("mode").value == "plurality_mode") {
     results = simple_plurality ( ballot_text );
-    console.log ( "Plurality Test: " + find_winner_in_results(results) );
+  } else if (document.getElementById("mode").value == "range_mode") {
     results = range_voting ( ballot_text );
-    console.log ( "Range Test:" + find_winner_in_results(results) );
+  } else if (document.getElementById("mode").value == "instant_runoff_mode") {
     results = instant_runoff ( ballot_text );
-    console.log ( "Instant Runoff Test: " + find_winner_in_results(results) );
+  } else if (document.getElementById("mode").value == "condorcet_mode") {
     results = condorcet ( ballot_text );
-    console.log ( "Condorcet Test: " + find_winner_in_results(results) );
-
-    // 100 samples of 4 candidates with 8 voters with range values 0 to 10
-    let num_samples = 1;
-    let num_candidates = 4;
-    let num_voters = 8;
-    let max_range = 9.5;
-
-    let num_plurality_ties = 0;
-    let num_range_ties = 0;
-    let num_runoff_ties = 0;
-    let num_condorcet_ties = 0;
-    ballot_text = "";
-    for (let casenum=0; casenum<1; casenum++) {
-      for (let v=0; v<num_voters; v++) {
-        let vb = "";
-        for (let c=0; c<num_candidates; c++) {
-          // vb += "c" + c + "[" + Math.round(Math.random() * max_range) + "] ";
-          vb += Math.round(Math.random() * max_range) + "," + c;
-        }
-        ballot_text += vb.split(' ').sort().reverse().join(' ') + "\n";
-      }
-      console.log ( ballot_text );
-      console.log ( "Pl: " + find_winner_in_results(simple_plurality ( ballot_text )) );
-      console.log ( "Rg: " + find_winner_in_results(range_voting ( ballot_text )) );
-      console.log ( "IR: " + find_winner_in_results(instant_runoff ( ballot_text )) );
-      console.log ( "Ct: " + find_winner_in_results(condorcet ( ballot_text )) );
-    }
-
   } else {
-    // Generate a normal result
-    let results = "";
-
-    if (document.getElementById("mode").value == "plurality_mode") {
-      results = simple_plurality ( ballot_text );
-    } else if (document.getElementById("mode").value == "range_mode") {
-      results = range_voting ( ballot_text );
-    } else if (document.getElementById("mode").value == "instant_runoff_mode") {
-      results = instant_runoff ( ballot_text );
-    } else if (document.getElementById("mode").value == "condorcet_mode") {
-      results = condorcet ( ballot_text );
-    } else {
-      results = "Mode not recognized.";
-    }
-
-    result_area.innerHTML = "<p>" + results + "</p>";
+    results = "Mode not recognized.";
   }
+
+  // result_area.innerHTML = "<p>" + results + "</p>";
+  result_area.innerHTML = results;
+
 }
 
 function change_methods() {
@@ -971,7 +1035,7 @@ function load_example() {
       "D A C B\n" +
       "D A B C\n" ;
 
-  } else if (document.getElementById("example").value == "concensus") {
+  } else if (document.getElementById("example").value == "consensus_2") {
     ballot_area.value =
       "a b c d e f g\n" +
       "b a c d e f g\n" +
@@ -988,19 +1052,6 @@ function load_example() {
       "g a b c d e f\n" +
       "g a b c d e f\n" ;
 
-  } else if (document.getElementById("example").value == "Ban_Scott") {
-    ballot_area.value =
-      "Y[100] N[0]  // KK\n" +
-      "Y[100] N[0]  // JB\n" +
-      "Y[100] N[0]  // SG\n" +
-      "Y[100] N[0]  // Dan\n" +
-      "Y[100] N[50] // Jason\n" +
-      "N[100] Y[50] // HGXC\n" +
-      "N[1]   Y[0]  // Scare\n" +
-      "N[100] Y[1]  // HGAAflyer\n" +
-      "N[100] Y[1]  // PilotGuy\n" +
-      "N[100] Y[0]  // SkyPilot\n" +
-      "N[100] Y[0]  // Bob\n" ;
   } else if (document.getElementById("example").value == "Java_Simple") {
     ballot_area.value =
       "C B A D\n" +
@@ -1212,7 +1263,7 @@ function load_example() {
       "D[5] A[4] R[3] S[2] T[1]\n" +
       "D[5] A[4] L[3] M[2] P[1]\n" ;
 
-  } else if (document.getElementById("example").value == "Java_StrongSecond2") {
+  } else if (document.getElementById("example").value == "consensus_1") {
     ballot_area.value =
       "A[9] B[4] C[3] D[2]\n" +
       "B[9] A[4] D[3] C[2]\n" +
@@ -1250,133 +1301,64 @@ function load() {
 
 </script>
 
-<body bgcolor="lightblue" onload="load()">
+<body onload="load()">
+
+
+<div id="page-header" style="margin-left: 0px; margin-right: 0px;">
+	<div class="v-midheader-left"><div class="v-midheader-right">
+		<div class="headerbar" style="margin-left: 0px; margin-right: 0px;">
+			<div class="inner" style="margin-left: 0px; margin-right: 0px;">
+				<span class="corners-top" style="background: #ff0000; margin-left: 0px; margin-right: 0px;"></span>
+					<div id="site-description" style="margin-left: 0px; margin-right: 0px;">
+						&nbsp; <img src="site_logo.png" alt="US Hawks Hang Gliding Association" title="US Hawks Hang Gliding Association" height="100" width="400">
+					</div>
+				<span class="corners-bottom" style="background: #00ff00"><span></span></span>
+			</div>
+		</div>
+</div>
+
 <center>
-<h2>Voting Methods Exploration</h2>
+<h1>Voting Methods Exploration</h1>
 
 <hr/>
-<!--
-<h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
-Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
-<p/>
--->
 
 <table width="100%" style="border: 0px;">
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 Ballots:<br/>
-<textarea width="100%" id="ballots" rows="16" cols="32">
+<textarea width="100%" id="ballots" rows="16" cols="30">
 C B A=D
 A C B D
 B C A=D
 A=D C B
 D C=B A
 </textarea>
-<!--
-[C B A=D]
-[A C B D]
-[B C A=D]
-[A=D C B]
-[D C=B A]
-
-C[3] > B[2] > A[1] = D[1]
-A[4] > C[3] > B[2] > D[1]
-B[3] > C[2] > A[1] = D[1]
-A[3] = D[3] > C[2] > B[1]
-D[3] > C[2] = B[2] > A[1]
-
-
-a
-b
-c
-d
-e
-b
-a
-c
-e
-c
-
-A C B D
-B A C D
-B A D C
-C B D A
-C A B D
-D A C B
-D A B C
-
-A C B D
-B A C D
-B A D C
-C B D A
-C A B D
-D A C B
-D A B C
-
-[b c a d]
-[d a c b]
-[a c b d]
-
-[a b c]
-[b a c]
-[b a c]
-[c a b]
-[c a b]
-
-[a b c d e f]
-[b a c d e f]
-[b a c d e f]
-[c a b d e f]
-[c a b d e f]
-[d a b c e f]
-[d a b c e f]
-[e a b c d f]
-[e a b c d f]
-[f a b c d e]
-[f a b c d e]
-[f a b c d e]
-
-[a(100) c(70) d(40) b(10)]
-[c(60) a(50) d(30) b(0)]
-[b(100)]
-[b(100)]
-
-[a c d b]
-[c a d b]
-[b]
-[c d b]
-[b c d]
-[d b a]
-[a c b d]
-[b d]
--->
 </td>
 
 <td width="70%" valign="top" style="border: 0px;">
-&nbsp; Notes for Version 23:</br>
+&nbsp; Notes:</br>
 <ul>
 <li>Each line is one ballot cast by one voter.</li>
 <li>Candidate choices are separated by spaces.</li>
 <li>The first choice is listed first (on the left).<br/>
-      &nbsp; Simple example ballot with "b" first: <b>b d a c</b></li>
+      &nbsp; Simple example ballot: <b>b d a c</b></li>
 <li>Equal choices are expressed with "<b>=</b>".<br/>
       &nbsp; Ballot with an equal choice: <b>b d=a c</b></li>
 <li>Numeric scores may be entered inside brackets.<br/>
       &nbsp; Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></li>
-      &nbsp; Highest numbers must come first!</b></li>
 <li>Voting methods use ordering and scores differently.</li>
-<li>Comments may start with either # or / or // .</li>
 </ul>
 
 <br/>
 
 &nbsp; &nbsp; <select id="example" onchange="change_example()">
 <option value="examples">Examples</option>
+<option value="consensus_1">Hidden Consensus 1</option>
+<option value="consensus_2">Hidden Consensus 2</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
-<option value="concensus">Hidden Concensus</option>
+<option value="Java_Transition_Team">Transition Team Vote</option>
 <option value="old_condorcet">2010 Condorcet</option>
 <option value="old_amimation_2013">2013 Animation</option>
-<option value="Ban_Scott">Ban Scott from HGAA</option>
 <option value="Java_Simple">Java Simple</option>
 <option value="Java_Simple#">Java #</option>
 <option value="Java_Simple=">Java =</option>
@@ -1387,9 +1369,6 @@ D A B C
 <option value="Java_XYZ">Java XYZ</option>
 <option value="Java_Schwartz">Java Schwartz</option>
 <option value="Java_StrongSecond1">Java Strong 2nd 1</option>
-<option value="Java_StrongSecond2">Java Strong 2nd 2</option>
-<option value="Java_Transition_Team">Java Transition Team</option>
-
 </select>
 
 <input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
@@ -1415,7 +1394,9 @@ D A B C
 <p/>
 </center>
 
-&nbsp; <select id="mode" onchange="change_methods()">
+<hr/>
+
+&nbsp; &nbsp; &nbsp; <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
 <option value="range_mode">Range</option>
 <option value="instant_runoff_mode">Instant Runoff</option>
@@ -1426,7 +1407,7 @@ D A B C
 
 <hr/>
 
-<div id="results"></div>
+<p id="results"></p>
 
 </body>
 
