@@ -221,7 +221,7 @@ class Ballot {
 
   parse_fmt2_ballot_string() {
     // Parse one ballot (optionally surrounded by [])
-    console.log ( "Parse Ballot: \"" + this.s + "\"" );
+    // console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
       this.choices = [];
       let in_value = false;
@@ -291,6 +291,8 @@ class Ballot {
         this_choice = null;
       }
       this.adjust_ranks();
+      this.remove_duplicates();
+      this.adjust_ranks();
     }
   }
 
@@ -301,7 +303,7 @@ class Ballot {
     for (let i=0; i<this.choices.length; i++) {
       if (this.choices[i].cand_name == name) {
         found = true;
-        console.log ( "Warning: Candidate " + name + " is already on the ballot." );
+        // console.log ( "Warning: Candidate " + name + " is already on the ballot." );
         break;
       }
     }
@@ -309,6 +311,8 @@ class Ballot {
       // Add the name to the ballot
       let choice = new Choice ( name, value );
       this.choices.push ( choice );
+      this.adjust_ranks();
+      this.remove_duplicates();
       this.adjust_ranks();
     }
   }
@@ -361,6 +365,50 @@ class Ballot {
         }
       }
     }
+  }
+
+  remove_duplicates() {
+    // Remove lower ranked duplicate candidates from this ballot
+    // console.log ( "Remove Duplicates from " + this.print_to_string() );
+    let all_names = [];
+    for (let i=0; i<this.choices.length; i++) {
+      let on_list = false;
+      for (let j=0; j<all_names.length; j++) {
+        if (this.choices[i].cand_name == all_names[j]) {
+          on_list = true;
+        }
+      }
+      if (on_list == false) {
+        all_names.push ( this.choices[i].cand_name );
+      }
+    }
+    // console.log ( "Unique Ballot names:" );
+    // for (let j=0; j<all_names.length; j++) {
+    //   console.log ( "  " + all_names[j] );
+    // }
+    // Recreate the list preserving only the highest ranked choices
+    let new_choices = [];
+    for (let n=0; n<all_names.length; n++) {
+      // console.log ( "Working on name " + all_names[n] );
+      for (let c=0; c<this.choices.length; c++) {
+        // console.log ( " Comparing to name " + this.choices[c].cand_name );
+        if (this.choices[c].cand_name == all_names[n]) {
+          // console.log ( "  Matched name is " + all_names[n] );
+          if (new_choices.length <= n) {
+            // This choice is not on the new_choices so add it
+            new_choices.push ( this.choices[c] );
+          } else {
+            // This choice is already on the new_choices, so compare ranks
+            if (new_choices[n].rank < this.choices[c].rank) {
+              // This choice is higher ranked, so replace it
+              new_choices[n] = this.choices[c];
+            }
+          }
+        }
+      }
+    }
+    // Replace the choices list
+    this.choices = new_choices;
   }
 
   prefers ( a, b ) {
@@ -430,7 +478,7 @@ class BallotBox {
       }
       this.build_cand_list()
     }
-    console.log ( this.print_to_string() );
+    // console.log ( this.print_to_string() );
   }
 
   print_to_string() {
@@ -487,7 +535,7 @@ bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 bb = null;
 
 function simple_plurality ( ballot_text ) {
-  console.log ( "Running Plurality" );
+  // console.log ( "Running Plurality" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -535,7 +583,7 @@ function simple_plurality ( ballot_text ) {
 }
 
 function range_voting ( ballot_text ) {
-  console.log ( "Running Range" );
+  // console.log ( "Running Range" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -607,7 +655,7 @@ function range_voting ( ballot_text ) {
 }
 
 function instant_runoff ( ballot_text ) {
-  console.log ( "Running Instant Runoff" );
+  // console.log ( "Running Instant Runoff" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
@@ -736,7 +784,7 @@ function condorcet ( ballot_text ) {
   // There can only be (at most) one Condorcet winner because two winners would imply that they beat each other
   // However, there may be conditions where no one candidate can beat all others meaning that there is no Condorcet Winner
 
-  console.log ( "Running Condorcet" );
+  // console.log ( "Running Condorcet" );
 
   /* let */ bb = new BallotBox ( ballot_text );
 
