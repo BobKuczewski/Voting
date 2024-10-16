@@ -270,6 +270,8 @@ class Ballot {
           } else {
             // This should be the start of a new name
             if (this_choice != null) {
+              // Finish the old name
+              this_choice.equals = in_equals;
               this.choices.push ( this_choice );
               this_choice = null;
               name = '';
@@ -415,14 +417,17 @@ class Ballot {
 
   prefers ( a, b ) {
     // Return 1 if this ballot prefers a over b, 0 if equal, -1 if b over a
-    console.log ( "Preference between " + a + " and " + b + " in: " + this.print_to_string() );
     let av = null;
     let bv = null;
+    let ae = null; // candidate a is equal
+    let be = null; // candidate b is equal
     let first = 0;
+    let pref = null;
     for (let i=0; i<this.choices.length; i++) {
       if (this.choices[i].cand_name == a) {
         if (av == null) {
           av = this.choices[i].rank;
+          ae = this.choices[i].equals;
           if (first == 0) {
             first = 1;
           }
@@ -431,18 +436,32 @@ class Ballot {
       if (this.choices[i].cand_name == b) {
         if (bv == null) {
           bv = this.choices[i].rank;
+          be = this.choices[i].equals;
           if (first == 0) {
             first = -1;
           }
         }
       }
     }
-    if ((av == null) && (bv == null)) return ( 0 );
-    if ((av != null) && (bv == null)) return ( 1 );
-    if ((av == null) && (bv != null)) return (-1 );
-    if (av > bv) return ( 1 );
-    if (av < bv) return (-1 );
-    if (av == bv) return ( first );
+    if ((av == null) && (bv == null)) {
+      pref = 0;
+    } else if ((av != null) && (bv == null)) {
+      pref = 1;
+    } else if ((av == null) && (bv != null)) {
+      pref = -1;
+    } else if (av > bv) {
+      pref = 1;
+    } else if (av < bv) {
+      pref = -1;
+    } else if (av == bv) {
+      if ( ( ae == true ) && ( be == true ) ) {
+        pref = 0;
+      } else {
+        pref = first;
+      }
+    }
+    console.log ( "Preference between " + a + " and " + b + " in: " + this.s + " is " + pref );
+    return ( pref );
   }
 
 }
@@ -491,7 +510,7 @@ class BallotBox {
       }
       this.build_cand_list()
     }
-    // console.log ( this.print_to_string() );
+    console.log ( this.print_to_string() );
   }
 
   print_to_string() {
@@ -1070,6 +1089,54 @@ function load_example() {
       "A=D C B\n" +
       "D C=B A\n" ;
 
+  } else if (document.getElementById("example").value == "DRT_ordered_only") {
+    ballot_area.value =
+      "r t d\n" +
+      "r t d\n" +
+      "r t d\n" +
+      "r t d\n" +
+      "\n" +
+      "t r d\n" +
+      "t r d\n" +
+      "\n" +
+      "d t r\n" +
+      "d t r\n" +
+      "d t r\n" +
+      "d t r\n" +
+      "d r t\n" ;
+
+  } else if (document.getElementById("example").value == "DRT_RangeDefault") {
+    ballot_area.value =
+      "r[3] t[2] d[1]\n" +
+      "r[3] t[2] d[1]\n" +
+      "r[3] t[2] d[1]\n" +
+      "r[3] t[2] d[1]\n" +
+      "\n" +
+      "t[3] r[2] d[1]\n" +
+      "t[3] r[2] d[1]\n" +
+      "\n" +
+      "d[3] t[2] r[1]\n" +
+      "d[3] t[2] r[1]\n" +
+      "d[3] t[2] r[1]\n" +
+      "d[3] t[2] r[1]\n" +
+      "d[3] r[2] t[1]\n" ;
+
+  } else if (document.getElementById("example").value == "DRT_RangeExtreme") {
+    ballot_area.value =
+      "r[100] t[0] d[0]\n" +
+      "r[100] t[0] d[0]\n" +
+      "r[100] t[0] d[0]\n" +
+      "r[100] t[0] d[0]\n" +
+      "\n" +
+      "t[100] r[0] d[0]\n" +
+      "t[100] r[0] d[0]\n" +
+      "\n" +
+      "d[100] t[0] r[0]\n" +
+      "d[100] t[0] r[0]\n" +
+      "d[100] t[0] r[0]\n" +
+      "d[100] t[0] r[0]\n" +
+      "d[100] r[0] t[0]\n" ;
+
   } else if (document.getElementById("example").value == "rock_paper_scissors") {
     ballot_area.value =
       "a b c\n" +
@@ -1416,6 +1483,9 @@ D C=B A
 <option value="examples">Examples</option>
 <option value="consensus_1">Hidden Consensus 1</option>
 <option value="consensus_2">Hidden Consensus 2</option>
+<option value="DRT_ordered_only">DRT (Ordered Only)</option>
+<option value="DRT_RangeDefault">DRT (Range Defaults)</option>
+<option value="DRT_RangeExtreme">DRT (Range Extremes)</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
 <option value="Java_Transition_Team">Transition Team Vote</option>
 <option value="old_condorcet">2010 Condorcet</option>
