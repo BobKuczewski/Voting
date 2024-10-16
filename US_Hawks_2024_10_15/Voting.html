@@ -198,6 +198,7 @@ class Ballot {
 
   constructor(s=null,format=2) {
     this.s = s;
+    console.log ( "Constructing ballot from: " + s );
     this.choices = [];
     if (format == 2) {
       this.parse_fmt2_ballot_string();
@@ -215,12 +216,13 @@ class Ballot {
   }
 
   parse_fmt1_ballot_string() {
-    this.s = this.s.replaceAll ( '[', '(' );
+    // Parse one ballot with optional range scores in [] such as: a[4] b[3] c[0]
+    this.s = this.s.replaceAll('[','(').replaceAll(']',')');
     this.parse_fmt2_ballot_string();
   }
 
   parse_fmt2_ballot_string() {
-    // Parse one ballot (optionally surrounded by [])
+    // Parse one ballot (optionally surrounded by []) such as [ a(4) b(3) c(0) ]
     // console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
       this.choices = [];
@@ -413,17 +415,25 @@ class Ballot {
 
   prefers ( a, b ) {
     // Return 1 if this ballot prefers a over b, 0 if equal, -1 if b over a
+    console.log ( "Preference between " + a + " and " + b + " in: " + this.print_to_string() );
     let av = null;
     let bv = null;
+    let first = 0;
     for (let i=0; i<this.choices.length; i++) {
       if (this.choices[i].cand_name == a) {
         if (av == null) {
           av = this.choices[i].rank;
+          if (first == 0) {
+            first = 1;
+          }
         }
       }
       if (this.choices[i].cand_name == b) {
         if (bv == null) {
           bv = this.choices[i].rank;
+          if (first == 0) {
+            first = -1;
+          }
         }
       }
     }
@@ -432,7 +442,7 @@ class Ballot {
     if ((av == null) && (bv != null)) return (-1 );
     if (av > bv) return ( 1 );
     if (av < bv) return (-1 );
-    if (av == bv) return ( 0 );
+    if (av == bv) return ( first );
   }
 
 }
@@ -461,14 +471,17 @@ class BallotBox {
       // Decide if this is format 1 or 2
       if (this.s.trim()[0] != '[') {
         // Format 1: Ballots separated by newline, range values in []
+        console.log ( "Ballots in format 1" );
         let blist = s.split('\n');
         for (let i=0; i<blist.length; i++) {
           if (blist[i].trim().length > 0) {
-            this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
+            // this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
+            this.add ( new Ballot ( blist[i].trim(), 1 ) );
           }
         }
       } else {
         // Format 2: Ballots enclosed in [], range values in ()
+        console.log ( "Ballots in format 2" );
         let blist = s.split('[');
         for (let i=0; i<blist.length; i++) {
           if (blist[i].length > 0) {
