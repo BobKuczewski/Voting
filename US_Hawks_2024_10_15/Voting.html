@@ -186,7 +186,8 @@ class Choice {
     this.cand_name = name;
     this.value = value;
     this.rank = null;  // The rank provides the ordering. Multiple candidates may share the same rank.
-    this.equals = false;
+    this.equals = false; // Implies equal to the candidate to the left
+    this.requals = false; // Implies equal to the candidate to the right
   }
   print_to_string() {
     let s = "cand: " + this.cand_name + ", val: " + this.value + ", rank: " + this.rank + ", eq: " + this.equals;
@@ -271,7 +272,7 @@ class Ballot {
             // This should be the start of a new name
             if (this_choice != null) {
               // Finish the old name
-              this_choice.equals = in_equals;
+              this_choice.requals = in_equals;
               this.choices.push ( this_choice );
               this_choice = null;
               name = '';
@@ -427,7 +428,7 @@ class Ballot {
       if (this.choices[i].cand_name == a) {
         if (av == null) {
           av = this.choices[i].rank;
-          ae = this.choices[i].equals;
+          ae = this.choices[i].requals;
           if (first == 0) {
             first = 1;
           }
