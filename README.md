@@ -14,3 +14,4 @@ The Voting program can be run here:
 
 ## [Run on-line](https://bobkuczewski.github.io/Voting/Voting.html)
 
+## View the [problem with Instant Runoff](https://github.com/BobKuczewski/Voting/blob/master/images/Instant_Runoff_Problem.gif)
