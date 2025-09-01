@@ -603,7 +603,7 @@ bd = new BallotBox ( "[g b d(70) f h a(20) c e] [a] [a b(100)]" );
 // Global ballot box
 bb = null;
 
-function simple_plurality ( ballot_text ) {
+function simple_plurality ( ballot_text, detail_level ) {
   // console.log ( "Running Plurality" );
 
   /* let */ bb = new BallotBox ( ballot_text );
@@ -620,12 +620,15 @@ function simple_plurality ( ballot_text ) {
 
   let result = "<b>Simple Plurality &nbsp; </b> (only first choice matters, equals and scores ignored):<br/>\n";
 
-  result += "Total votes cast: <b>" + bb.ballots.length + "</b><br/>\n";
-
+  if (detail_level >= 5) {
+    result += "Total votes cast: <b>" + bb.ballots.length + "</b><br/>\n";
+  }
   for (let i=0; i<bb.cand_list.length; i++) {
-    result += "Candidate <b>" + bb.cand_list[i]
-            + "</b> got " + machine[bb.cand_list[i]]
-            + " first choice votes<br/>\n";
+    if (detail_level >= 5) {
+      result += "Candidate <b>" + bb.cand_list[i]
+              + "</b> got " + machine[bb.cand_list[i]]
+              + " first choice votes<br/>\n";
+    }
   }
 
   let highest_votes = -1;
@@ -641,9 +644,9 @@ function simple_plurality ( ballot_text ) {
     }
   }
   if (highest_candidates.length == 1) {
-    result += " --&gt; Simple Plurality Winner is: <b>" + highest_candidates[0] + "</b><br/>";
+    result += "<b>The Simple Plurality Winner is: &nbsp; " + highest_candidates[0] + "</b><br/>\n";
   } else if (highest_candidates.length > 1) {
-    result += "--&gt; Simple Plurality Winners are: <b>" + highest_candidates + "</b>";
+    result += "<b>The Simple Plurality Winners are: &nbsp; " + highest_candidates + "</b><br/>\n";
   } else {
     result += "No Candidates Found.";
   }
@@ -652,7 +655,7 @@ function simple_plurality ( ballot_text ) {
 }
 
 
-function range_voting ( ballot_text ) {
+function range_voting ( ballot_text, detail_level ) {
   // console.log ( "Running Range" );
 
   /* let */ bb = new BallotBox ( ballot_text );
@@ -709,9 +712,11 @@ function range_voting ( ballot_text ) {
     if (machine[bb.cand_list[i]] > max_val) {
       max_val = machine[bb.cand_list[i]];
     }
-    result += "Candidate <b>" + bb.cand_list[i]
-            + "</b> got a total of " + machine[bb.cand_list[i]]
-            + " range points<br/>\n";
+    if (detail_level >= 5) {
+      result += "Candidate <b>" + bb.cand_list[i]
+              + "</b> got a total of " + machine[bb.cand_list[i]]
+              + " range points<br/>\n";
+    }
   }
 
   let winners = [];
@@ -722,15 +727,15 @@ function range_voting ( ballot_text ) {
   }
 
   if (winners.length <= 1) {
-    result += "--&gt; Range Winner is: <b>" + winners + "</b>";
+    result += "<b>The Range Winner is: &nbsp; " + winners + "</b>\n";
   } else {
-    result += "--&gt; Range Winners are: <b>" + winners + "</b>";
+    result += "<b>The Range Winners are: &nbsp; " + winners + "</b>\n";
   }
 
   return ( result );
 }
 
-function instant_runoff ( ballot_text ) {
+function instant_runoff ( ballot_text, detail_level ) {
   // console.log ( "Running Instant Runoff" );
 
   /* let */ bb = new BallotBox ( ballot_text );
@@ -758,15 +763,14 @@ function instant_runoff ( ballot_text ) {
   while (winner == null) {
 
     round_num += 1;
-    result += "&nbsp; Round " + round_num + "<br/>";
 
-    // result += bb.print_to_string() + "<br/>";
-
-
-    for (bnum=0; bnum<ballot_list.length; bnum++) {
-      result += "&nbsp; &nbsp; &nbsp; " + ballot_list[bnum] + "<br/>\n";
+    if (detail_level >= 5) {
+      result += "&nbsp; Round " + round_num + "<br/>";
+      // result += bb.print_to_string() + "<br/>";
+      for (bnum=0; bnum<ballot_list.length; bnum++) {
+        result += "&nbsp; &nbsp; &nbsp; " + ballot_list[bnum] + "<br/>\n";
+      }
     }
-
 
     // See if there is a majority winner among the first choices
     // Also keep track of the loser among the first choices
@@ -813,13 +817,17 @@ function instant_runoff ( ballot_text ) {
 
       // Save the winner to terminate the loop
       winner = highest_candidates;
-      result += "&nbsp; &nbsp; Majority Winner: <b>" + winner + "</b> had " + highest_value + " first choice votes.<br/>";
+      if (detail_level >= 5) {
+        result += "&nbsp; &nbsp; Majority Winner: <b>" + winner + "</b> had " + highest_value + " first choice votes.<br/>";
+      }
 
     } else if (remaining_cand_list.length <= 1) {
 
       // Save the winner to terminate the loop
       winner = remaining_cand_list[0];
-      result += "&nbsp; &nbsp; Last remaining: <b>" + winner + "</b><br/>";
+      if (detail_level >= 5) {
+        result += "&nbsp; &nbsp; Last remaining: <b>" + winner + "</b><br/>";
+      }
 
     } else {
 
@@ -828,10 +836,14 @@ function instant_runoff ( ballot_text ) {
       if (lowest_candidates.length > 1) {
         // Compute a repeatable random number for this set of ballots
         elim_index = bb.repeatable_random() % lowest_candidates.length;
-        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[elim_index] + "</b> (chosen at random among those with fewest first choice votes)<br/>";
+        if (detail_level >= 5) {
+          result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[elim_index] + "</b> (chosen at random among those with fewest first choice votes)<br/>";
+        }
       } else {
         elim_index = 0;
-        result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[elim_index] + "</b> (fewest first choice votes)<br/>";
+        if (detail_level >= 5) {
+          result += "&nbsp; &nbsp; Eliminating <b>" + lowest_candidates[elim_index] + "</b> (fewest first choice votes)<br/>";
+        }
       }
       let reduced_list = [];
       for (let ci=0; ci<remaining_cand_list.length; ci++) {
@@ -857,15 +869,15 @@ function instant_runoff ( ballot_text ) {
   }
 
   if (winner.length <= 1) {
-    result += "--&gt; Instant Runoff Winner is: <b>" + winner + "</b>";
+    result += "<b>The Instant Runoff Winner is: &nbsp; " + winner + "</b>\n";
   } else {
-    result += "--&gt; Instant Runoff Winners are: <b>" + winner + "</b>";
+    result += "<b>The Instant Runoff Winners are: &nbsp; " + winner + "</b>\n";
   }
 
   return ( result );
 }
 
-function condorcet ( ballot_text ) {
+function condorcet ( ballot_text, detail_level ) {
   // The Condorcet Winner is the one candidate that will beat all others in a one on one election
   // There can only be (at most) one Condorcet winner because two winners would imply that they beat each other
   // However, there may be conditions where no one candidate can beat all others meaning that there is no Condorcet Winner
@@ -932,175 +944,172 @@ function condorcet ( ballot_text ) {
   if (winner == null) {
     result += "<b>No Condorcet Winner.<br/>\n";
   } else {
-
     result += "<b>The Condorcet Winner is: &nbsp; " + winner + "\n";
-
   }
 
-  // Show the win/loss table and an explanation
-
-  result += "<hr/>\n";
-
-  // Results table (contains other tables)
-  result += "<table width=\"100%\" style=\"border: 0px;\">\n";
-  result += "<tr style=\"border: 0px;\">\n";
-
-
-  // Overall win/loss matrix
-  result += "<td valign=\"top\" style=\"border: 0px;\">\n";
-  result += "<table>\n";
-  for (let i=-1; i<num_candidates; i++) {
-    result += "<tr>\n";
-    for (let j=-1; j<num_candidates; j++) {
-      if (i == j) {
-        if (i < 0) {
-          result += "<th><center>\\</center></th>\n";
-        } else {
-          result += "<td><center>\\</center></td>\n";
-        }
-      } else {
-        if (i < 0) {
-          result += "<th><center>" + bb.cand_list[j] + "</center></th>\n";
-        } else if (j < 0) {
-          result += "<th><center>" + bb.cand_list[i] + "</center></th>\n";
-        } else {
-          result += "<td><center>" + table[i][j] + "</center></td>\n";
-        }
-      }
-    }
-    result += "</tr>\n";
-  }
-
-  result += "</table>\n";
-  result += "</td>\n";
-
-  result += "<td valign=\"top\" style=\"border: 0px;\">\n";
-  result += "<p>\n";
-  result += "Result Tables\n";
-  result += "</p>\n";
-  result += "<p>\n";
-  result += "The table to the left shows the win/loss counts for each pair \n";
-  result += "of candidates. If there is a Condorcet Winner, then there will \n";
-  result += "also be a series of tables below. These tables (below) will show how \n";
-  result += "each ballot contributed to the winner defeating every other candidate \n";
-  result += "in the election. \n";
-  result += "</p>\n";
-  result += "</td>\n";
-
-  result += "</tr>\n";
-  result += "</table>\n";
-
-  if (winner != null) {
-
-    // Show the tables comparing the winner with each loser
-
+  if (detail_level >= 5) {
+    // Show the win/loss table and an explanation
     result += "<hr/>\n";
 
     // Results table (contains other tables)
     result += "<table width=\"100%\" style=\"border: 0px;\">\n";
     result += "<tr style=\"border: 0px;\">\n";
 
-    // Raw ballot table
-    let max_choices = bb.get_max_choices();
+    // Overall win/loss matrix
     result += "<td valign=\"top\" style=\"border: 0px;\">\n";
     result += "<table>\n";
-    result += "<tr><th colspan=\"" + max_choices + "\"><b>" + "Ballots" + "</b></th></tr>\n";
-    for (let r=0; r<bb.ballots.length; r++) {
+    for (let i=-1; i<num_candidates; i++) {
       result += "<tr>\n";
-      for (let c=0; c<max_choices; c++) {
-        let cand = "&nbsp;";
-        if (c < bb.ballots[r].choices.length) {
-          cand = bb.ballots[r].choices[c].cand_name;
-          if (bb.ballots[r].choices[c].equals) {
-            cand = "=" + cand;
+      for (let j=-1; j<num_candidates; j++) {
+        if (i == j) {
+          if (i < 0) {
+            result += "<th><center>\\</center></th>\n";
+          } else {
+            result += "<td><center>\\</center></td>\n";
+          }
+        } else {
+          if (i < 0) {
+            result += "<th><center>" + bb.cand_list[j] + "</center></th>\n";
+          } else if (j < 0) {
+            result += "<th><center>" + bb.cand_list[i] + "</center></th>\n";
+          } else {
+            result += "<td><center>" + table[i][j] + "</center></td>\n";
           }
         }
-        result += "<td>" + cand + "</td>\n";
       }
       result += "</tr>\n";
     }
+
     result += "</table>\n";
     result += "</td>\n";
 
-    // Comparison of winner to each other candidate
+    result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+    result += "<p>\n";
+    result += "Result Tables\n";
+    result += "</p>\n";
+    result += "<p>\n";
+    result += "The table to the left shows the win/loss counts for each pair \n";
+    result += "of candidates. If there is a Condorcet Winner, then there will \n";
+    result += "also be a series of tables below. These tables (below) will show how \n";
+    result += "each ballot contributed to the winner defeating every other candidate \n";
+    result += "in the election. \n";
+    result += "</p>\n";
+    result += "</td>\n";
 
-    for (let cn=0; cn<num_candidates; cn++) {
+    result += "</tr>\n";
+    result += "</table>\n";
 
-      if (bb.cand_list[cn] != winner) {
+    if (winner != null) {
 
-        // Table of Ballots for winner and loser cn
-        let loser = bb.cand_list[cn];
+      // Show the tables comparing the winner with each loser
 
-        result += "<td valign=\"top\" style=\"border: 0px;\">\n";
-        result += "<table>\n";
-        result += "<tr><th colspan=\"2\"><b>" + winner + " v " + loser + "</b></th></tr>\n";
-        for (let k=0; k<num_ballots; k++) {
-          let b = bb.ballots[k];
-          let c = b.choices;
-          let winner_index = -1;
-          let loser_index = -1;
-          for (let ci=0; ci<c.length; ci++) {
-            if ( c[ci].cand_name == winner ) winner_index = ci;
-            if ( c[ci].cand_name == loser  ) loser_index = ci;
-          }
-          if ( (winner_index < 0) && (loser_index < 0) ) {
-            result += "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
-          } else if (loser_index < 0) {
-            result += "<tr><td>" + c[winner_index].cand_name + "</td><td>&nbsp;</td></tr>\n";
-          } else if (winner_index < 0) {
-            result += "<tr><td>&nbsp;</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
-          } else if (c[winner_index].rank == c[loser_index].rank) {
-            result += "<tr><td>=</td><td>=</td></tr>\n";
-          } else if (c[winner_index].rank > c[loser_index].rank) {
-            result += "<tr><td>" + c[winner_index].cand_name + "</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
-          } else if (c[winner_index].rank < c[loser_index].rank) {
-            result += "<tr><td>" + c[loser_index].cand_name + "</td><td>" + c[winner_index].cand_name + "</td></tr>\n";
-          } else {
-            result += "<tr><td>??</td><td>??</td></tr>\n";
-          }
-          /*
-          if (found_winner && found_loser) {
-            result += "<tr>\n";
-            for (let ci=0; ci<c.length; ci++) {
-              if ( c[ci].cand_name == winner ) {
-                result += "<td>" + winner + "</td>\n";
-              }
-              if ( c[ci].cand_name == loser ) {
-                result += "<td>" + loser + "</td>\n";
-              }
+      result += "<hr/>\n";
+
+      // Results table (contains other tables)
+      result += "<table width=\"100%\" style=\"border: 0px;\">\n";
+      result += "<tr style=\"border: 0px;\">\n";
+
+      // Raw ballot table
+      let max_choices = bb.get_max_choices();
+      result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+      result += "<table>\n";
+      result += "<tr><th colspan=\"" + max_choices + "\"><b>" + "Ballots" + "</b></th></tr>\n";
+      for (let r=0; r<bb.ballots.length; r++) {
+        result += "<tr>\n";
+        for (let c=0; c<max_choices; c++) {
+          let cand = "&nbsp;";
+          if (c < bb.ballots[r].choices.length) {
+            cand = bb.ballots[r].choices[c].cand_name;
+            if (bb.ballots[r].choices[c].equals) {
+              cand = "=" + cand;
             }
-            result += "</td></tr>\n";
           }
-          */
+          result += "<td>" + cand + "</td>\n";
         }
-        result += "</table>\n";
-        result += "<p>" + winner + " vs " + loser + ":<br/> " + table[winner_index][cn] + " to " + table[cn][winner_index] + "</p>";
-        result += "</td>\n";
+        result += "</tr>\n";
+      }
+      result += "</table>\n";
+      result += "</td>\n";
+
+      // Comparison of winner to each other candidate
+
+      for (let cn=0; cn<num_candidates; cn++) {
+
+        if (bb.cand_list[cn] != winner) {
+
+          // Table of Ballots for winner and loser cn
+          let loser = bb.cand_list[cn];
+
+          result += "<td valign=\"top\" style=\"border: 0px;\">\n";
+          result += "<table>\n";
+          result += "<tr><th colspan=\"2\"><b>" + winner + " v " + loser + "</b></th></tr>\n";
+          for (let k=0; k<num_ballots; k++) {
+            let b = bb.ballots[k];
+            let c = b.choices;
+            let winner_index = -1;
+            let loser_index = -1;
+            for (let ci=0; ci<c.length; ci++) {
+              if ( c[ci].cand_name == winner ) winner_index = ci;
+              if ( c[ci].cand_name == loser  ) loser_index = ci;
+            }
+            if ( (winner_index < 0) && (loser_index < 0) ) {
+              result += "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+            } else if (loser_index < 0) {
+              result += "<tr><td>" + c[winner_index].cand_name + "</td><td>&nbsp;</td></tr>\n";
+            } else if (winner_index < 0) {
+              result += "<tr><td>&nbsp;</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
+            } else if (c[winner_index].rank == c[loser_index].rank) {
+              result += "<tr><td>=</td><td>=</td></tr>\n";
+            } else if (c[winner_index].rank > c[loser_index].rank) {
+              result += "<tr><td>" + c[winner_index].cand_name + "</td><td>" + c[loser_index].cand_name + "</td></tr>\n";
+            } else if (c[winner_index].rank < c[loser_index].rank) {
+              result += "<tr><td>" + c[loser_index].cand_name + "</td><td>" + c[winner_index].cand_name + "</td></tr>\n";
+            } else {
+              result += "<tr><td>??</td><td>??</td></tr>\n";
+            }
+            /*
+            if (found_winner && found_loser) {
+              result += "<tr>\n";
+              for (let ci=0; ci<c.length; ci++) {
+                if ( c[ci].cand_name == winner ) {
+                  result += "<td>" + winner + "</td>\n";
+                }
+                if ( c[ci].cand_name == loser ) {
+                  result += "<td>" + loser + "</td>\n";
+                }
+              }
+              result += "</td></tr>\n";
+            }
+            */
+          }
+          result += "</table>\n";
+          result += "<p>" + winner + " vs " + loser + ":<br/> " + table[winner_index][cn] + " to " + table[cn][winner_index] + "</p>";
+          result += "</td>\n";
+
+        }
 
       }
 
-    }
+      /* Optional Text Report
+      result += "<hr/>\n";
 
-    /* Optional Text Report
-    result += "<hr/>\n";
-
-    for (let i=0; i<num_candidates; i++) {
-      for (let j=0; j<num_candidates; j++) {
-        if (i != j) {
-          if (bb.cand_list[i] == winner) {
-            result += " " + bb.cand_list[i] + " vs " + bb.cand_list[j] + ": " + table[i][j] + " to " + table[j][i] + "<br/>";
+      for (let i=0; i<num_candidates; i++) {
+        for (let j=0; j<num_candidates; j++) {
+          if (i != j) {
+            if (bb.cand_list[i] == winner) {
+              result += " " + bb.cand_list[i] + " vs " + bb.cand_list[j] + ": " + table[i][j] + " to " + table[j][i] + "<br/>";
+            }
           }
         }
       }
+      */
     }
-    */
-
   }
 
   return ( result );
 }
 
-function calc_results() {
+function calc_results ( detail_level ) {
 
   let ballot_area = document.getElementById ( "ballots" );
 
@@ -1109,13 +1118,13 @@ function calc_results() {
   let results = "";
 
   if (document.getElementById("mode").value == "plurality_mode") {
-    results = simple_plurality ( ballot_text );
+    results = simple_plurality ( ballot_text, detail_level );
   } else if (document.getElementById("mode").value == "range_mode") {
-    results = range_voting ( ballot_text );
+    results = range_voting ( ballot_text, detail_level );
   } else if (document.getElementById("mode").value == "instant_runoff_mode") {
-    results = instant_runoff ( ballot_text );
+    results = instant_runoff ( ballot_text, detail_level );
   } else if (document.getElementById("mode").value == "condorcet_mode") {
-    results = condorcet ( ballot_text );
+    results = condorcet ( ballot_text, detail_level );
   } else {
     results = "Mode not recognized.";
   }
@@ -1600,8 +1609,8 @@ D C=B A
 <option value="condorcet_mode">Condorcet</option>
 </select>
 
-&nbsp; <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results()"></input>
-
+&nbsp; <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results(0)"></input>
+&nbsp; <input type="button" name="ref_model" value="Calculate Detailed Results" onclick="calc_results(5)"></input>
 <hr/>
 
 <p id="results"></p>
