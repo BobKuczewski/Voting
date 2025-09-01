@@ -206,7 +206,6 @@ class Ballot {
 
   constructor(s=null,format=2) {
     this.s = s;
-    console.log ( "Constructing ballot from: " + s );
     this.choices = [];
     if (format == 2) {
       this.parse_fmt2_ballot_string();
@@ -517,7 +516,6 @@ class BallotBox {
       // Decide if this is format 1 or 2
       if (this.s.trim()[0] != '[') {
         // Format 1: Ballots separated by newline, range values in []
-        console.log ( "Ballots in format 1" );
         let blist = s.split('\n');
         // Remove /, //, and # Comments:
         for (let i=0; i<blist.length; i++) {
@@ -538,7 +536,6 @@ class BallotBox {
         }
       } else {
         // Format 2: Ballots enclosed in [], range values in ()
-        console.log ( "Ballots in format 2" );
         let blist = s.split('[');
         for (let i=0; i<blist.length; i++) {
           if (blist[i].length > 0) {
@@ -548,7 +545,6 @@ class BallotBox {
       }
       this.build_cand_list()
     }
-    console.log ( this.print_to_string() );
   }
 
   repeatable_random() {
@@ -621,6 +617,9 @@ function simple_plurality ( ballot_text, detail_level ) {
   // console.log ( "Running Plurality" );
 
   /* let */ bb = new BallotBox ( ballot_text );
+  if ( (bb.ballots.length <= 0) || (bb.cand_list.length <= 0) ) {
+    return ( "<b>No ballots or candidates.</b>" );
+  }
 
   let machine = {};
   for (i=0; i<bb.cand_list.length; i++) {
@@ -673,6 +672,9 @@ function range_voting ( ballot_text, detail_level ) {
   // console.log ( "Running Range" );
 
   /* let */ bb = new BallotBox ( ballot_text );
+  if ( (bb.ballots.length <= 0) || (bb.cand_list.length <= 0) ) {
+    return ( "<b>No ballots or candidates.</b>" );
+  }
 
   let result = "<b>Range Voting &nbsp; </b> (uses sum of scores):<br/>\n";
 
@@ -753,6 +755,9 @@ function instant_runoff ( ballot_text, detail_level ) {
   // console.log ( "Running Instant Runoff" );
 
   /* let */ bb = new BallotBox ( ballot_text );
+  if ( (bb.ballots.length <= 0) || (bb.cand_list.length <= 0) ) {
+    return ( "<b>No ballots or candidates.</b>" );
+  }
 
   let result = "<b>Instant Runoff Voting &nbsp; </b> (evaluate and replace, equals and scores ignored):<br/>\n";
 
@@ -899,6 +904,9 @@ function condorcet ( ballot_text, detail_level ) {
   // console.log ( "Running Condorcet" );
 
   /* let */ bb = new BallotBox ( ballot_text );
+  if ( (bb.ballots.length <= 0) || (bb.cand_list.length <= 0) ) {
+    return ( "<b>No ballots or candidates.</b>" );
+  }
 
   let result = "<b>Condorcet Voting &nbsp; </b> (winner must defeat all others, scores ignored):<br/>\n";
 
@@ -1123,6 +1131,15 @@ function condorcet ( ballot_text, detail_level ) {
   return ( result );
 }
 
+function find_winner_in_results (results) {
+  // Winner(s) may? be surrounded with: <span id="winner">W</span>
+  let wtag = '<span id="winner">';
+  let wstart = results.substring ( results.indexOf(wtag) + wtag.length );
+  let winner = wstart.substring(0, wstart.indexOf('</span>'));
+  // console.log ( "Winner is \"" + winner + "\"" );
+  return ( winner );
+}
+
 function calc_results ( detail_level ) {
 
   let ballot_area = document.getElementById ( "ballots" );
@@ -1277,6 +1294,20 @@ function load_example() {
       "C A D B\n" +
       "D A B C\n" +
       "D A B C\n" ;
+
+  } else if (document.getElementById("example").value == "Ban_Scott") {
+    ballot_area.value =
+      "Y[100] N[0]  // KK\n" +
+      "Y[100] N[0]  // JB\n" +
+      "Y[100] N[0]  // SG\n" +
+      "Y[100] N[0]  // Dan\n" +
+      "Y[100] N[50] // Jason\n" +
+      "N[100] Y[50] // HGXC\n" +
+      "N[1]   Y[0]  // Scare\n" +
+      "N[100] Y[1]  // HGAAflyer\n" +
+      "N[100] Y[1]  // PilotGuy\n" +
+      "N[100] Y[0]  // SkyPilot\n" +
+      "N[100] Y[0]  // Bob\n" ;
 
   } else if (document.getElementById("example").value == "Java_Simple") {
     ballot_area.value =
@@ -1488,6 +1519,16 @@ function load_example() {
       "C[5] A[4] I[3] J[2] K[1]\n" +
       "D[5] A[4] R[3] S[2] T[1]\n" +
       "D[5] A[4] L[3] M[2] P[1]\n" ;
+
+  } else if (document.getElementById("example").value == "Java_StrongSecond2") {
+    ballot_area.value =
+      "A[9] B[4] C[3] D[2]\n" +
+      "B[9] A[4] D[3] C[2]\n" +
+      "B[9] A[4] D[3] C[2]\n" +
+      "C[9] A[4] B[3] D[2]\n" +
+      "C[9] A[4] B[3] D[2]\n" +
+      "D[9] A[4] B[3] C[2]\n" +
+      "D[9] A[4] B[3] C[2]\n" ;
 
   } else if (document.getElementById("example").value == "Java_Transition_Team") {
     ballot_area.value =
