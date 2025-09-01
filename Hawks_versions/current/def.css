@@ -1,0 +1,152 @@
+/* Simple Default Style Sheet */
+
+/* HTML for the entire document or site */
+html {
+  font-size: 18px;
+  font-family: verdana, helvetica, arial, sans-serif;
+	background-image: url('board_bg.png');
+}
+
+
+html, body {
+	color: #536482;
+	background-color: #667183;
+	background-image: url('board_bg.png');
+}
+
+/* Body for the entire document or site */
+body {
+  /* background-color: #777777	; */  /* Web-Safe Light Blue is ccccff */
+  color: #000000;  /* Text Color - Web-Safe Dark Blue is 000066 */
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+	background-image: url('board_bg.png');
+}
+
+.pagebody {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* Headings for the entire document or site */
+
+h1 {
+  font-size: 150%;
+  font-weight: bold;
+  color: #000000;
+}
+
+h2 {
+  font-size: 130%;
+  font-weight: bold;
+  color: #000000;
+}
+
+h3 {
+  font-size: 110%;
+  font-weight: bold;
+  color: #000000;
+}
+
+
+/* Regular Text */
+
+/* All paragraphs */
+p {
+  text-indent: 16px;
+}
+
+/* All bold text */
+b {
+  font-weight: bold;
+  font-size: 104%;
+}
+
+/* Links */
+a:link {
+  text-decoration: none;
+  color: #381F15;
+  background-color: inherit;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #78432D;
+  background-color: inherit;
+}
+
+a:hover {
+  color: #A65D3E;
+  background-color: inherit;
+}
+
+a:active {
+  text-decoration: none;
+  color: #C05600;
+  background-color: inherit;
+}
+
+
+
+/* Uses Classes */
+
+h2.green {
+  color: #00aa00;
+}
+
+/*
+h2.2x {
+  font-size: 200%;
+}
+*/
+
+p.small {
+  font-size: 70%;
+}
+
+p.myquote {
+  font-size: 150%;
+  background-color: #000000;
+  color: #ffff00;
+  text-indent: 40px;
+}
+
+.inner {
+  background-image: url('header_bg.png');
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.headerbar {
+	background-image: url('xheader_bg.png');
+	color: #FFFFFF;
+	height: 122px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/*
+.icon_index { 
+  background: "images/icon_index.png" no-repeat bottom left;
+  background: "#ffff00";
+}
+
+.inner {
+  background-image: "header_bg.png";
+}
+
+.headerbar {
+	background-color: #12A3EB;
+	background-image: "header_bg.png";
+	color: #FFFFFF;
+	height: 122px;
+	
+}
+*/
+	/*border-left: 1px solid #000;
+	border-right: 1px solid #000;*/
+
+
+/* End of Style Sheet */
