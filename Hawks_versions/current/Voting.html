@@ -1583,7 +1583,7 @@ function load() {
 <tr style="border: 0px;">
 <td width="30%" valign="top" style="border: 0px;">
 Ballots:<br/>
-<textarea width="100%" id="ballots" rows="16" cols="30">
+<textarea width="100%" id="ballots" rows="16" cols="32">
 C B A=D
 A C B D
 B C A=D
@@ -1614,13 +1614,11 @@ D C=B A
 <option value="consensus_1">Hidden Consensus 1</option>
 <option value="consensus_2">Hidden Consensus 2</option>
 <option value="consensus_3">Hidden Consensus 3</option>
-<option value="DRT_ordered_only">DRT (Ordered Only)</option>
-<option value="DRT_RangeDefault">DRT (Range Defaults)</option>
-<option value="DRT_RangeExtreme">DRT (Range Extremes)</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
 <option value="Java_Transition_Team">Transition Team Vote</option>
 <option value="old_condorcet">2010 Condorcet</option>
 <option value="old_amimation_2013">2013 Animation</option>
+<option value="Ban_Scott">Ban Scott from HGAA</option>
 <option value="Java_Simple">Java Simple</option>
 <option value="Java_Simple#">Java #</option>
 <option value="Java_Simple=">Java =</option>
@@ -1631,6 +1629,10 @@ D C=B A
 <option value="Java_XYZ">Java XYZ</option>
 <option value="Java_Schwartz">Java Schwartz</option>
 <option value="Java_StrongSecond1">Java Strong 2nd 1</option>
+<option value="Java_StrongSecond2">Java Strong 2nd 2</option>
+<option value="DRT_ordered_only">DRT (Ordered Only)</option>
+<option value="DRT_RangeDefault">DRT (Range Defaults)</option>
+<option value="DRT_RangeExtreme">DRT (Range Extremes)</option>
 </select>
 
 <input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
@@ -1658,7 +1660,7 @@ D C=B A
 
 <hr/>
 
-&nbsp; &nbsp; &nbsp; <select id="mode" onchange="change_methods()">
+&nbsp; &nbsp; <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
 <option value="range_mode">Range</option>
 <option value="instant_runoff_mode">Instant Runoff</option>

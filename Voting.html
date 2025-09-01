@@ -1,7 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 1.0 Transitional//EN">
 <html>
 
 <head>
-<title>Voting Methods Exploration Version 23</title>
+<title>Voting Methods Exploration Version 24</title>
 <meta charset="utf-8"/>
 <style>
   table, tr, th, td {
@@ -1424,11 +1425,6 @@ function load() {
 <h2>Voting Methods Exploration</h2>
 
 <hr/>
-<!--
-<h3>Candidates: &nbsp; a, b, c, ... x, y, z  &nbsp; &nbsp; &nbsp; &nbsp;
-Ballots: &nbsp; [1st 2nd 3rd] ... [1st 2nd 3rd]</h3>
-<p/>
--->
 
 <table width="100%" style="border: 0px;">
 <tr style="border: 0px;">
@@ -1449,12 +1445,11 @@ D C=B A
 <li>Each line is one ballot cast by one voter.</li>
 <li>Candidate choices are separated by spaces.</li>
 <li>The first choice is listed first (on the left).<br/>
-      &nbsp; Simple example ballot with "b" first: <b>b d a c</b></li>
+      &nbsp; <i>Simple example ballot: <b>b d a c</b></i></li>
 <li>Equal choices are expressed with "<b>=</b>".<br/>
-      &nbsp; Ballot with an equal choice: <b>b d=a c</b></li>
+      &nbsp; <i>Ballot with an equal choice: <b>b d=a c</b></i></li>
 <li>Numeric scores may be entered inside brackets.<br/>
-      &nbsp; Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></li>
-      &nbsp; Highest numbers must come first!</b></li>
+      &nbsp; <i>Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></i></li>
 <li>Voting methods may use ordering and scores differently.</li>
 <li>Comments may start with either # or /.</li>
 </ul>
@@ -1463,9 +1458,11 @@ D C=B A
 
 &nbsp; &nbsp; <select id="example" onchange="change_example()">
 <option value="examples">Examples</option>
-<option value="concensus">Hidden Concensus</option>
+<option value="consensus_1">Hidden Consensus 1</option>
+<option value="consensus_2">Hidden Consensus 2</option>
+<option value="consensus_3">Hidden Consensus 3</option>
 <option value="rock_paper_scissors">Rock Paper Scissors</option>
-<option value="Java_Transition_Team">Java Transition Team</option>
+<option value="Java_Transition_Team">Transition Team Vote</option>
 <option value="old_condorcet">2010 Condorcet</option>
 <option value="old_amimation_2013">2013 Animation</option>
 <option value="Ban_Scott">Ban Scott from HGAA</option>
@@ -1480,7 +1477,9 @@ D C=B A
 <option value="Java_Schwartz">Java Schwartz</option>
 <option value="Java_StrongSecond1">Java Strong 2nd 1</option>
 <option value="Java_StrongSecond2">Java Strong 2nd 2</option>
-
+<option value="DRT_ordered_only">DRT (Ordered Only)</option>
+<option value="DRT_RangeDefault">DRT (Range Defaults)</option>
+<option value="DRT_RangeExtreme">DRT (Range Extremes)</option>
 </select>
 
 <input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
@@ -1506,7 +1505,7 @@ D C=B A
 <p/>
 </center>
 
-&nbsp; <select id="mode" onchange="change_methods()">
+&nbsp; &nbsp; <select id="mode" onchange="change_methods()">
 <option value="plurality_mode">Simple Plurality</option>
 <option value="range_mode">Range</option>
 <option value="instant_runoff_mode">Instant Runoff</option>
