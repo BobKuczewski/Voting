@@ -249,78 +249,81 @@ class Ballot {
     // Parse one ballot (optionally surrounded by []) such as [ a(4) b(3) c(0) ]
     // console.log ( "Parse Ballot: \"" + this.s + "\"" );
     if (this.s != null) {
-      this.choices = [];
-      let in_value = false;
-      let in_equals = false;
-      let in_name = false;
-      let name = '';
-      let value = null;
-      let i = 0;
-      let this_choice = null;
-      while (i < this.s.length) {
-        if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
-          // Found a space or insignificant character
-          i++;
-        } else if (this.s[i] == '(') {
-          // Found start of rank
-          in_value = true;
-          i++;
-        } else if (this.s[i] == ')') {
-          // Found end of rank
-          in_value = false;
-          i++;
-        } else if (this.s[i] == '=') {
-          // Found an equals
-          in_equals = true;
-          i++;
-        } else {
-          // Found some other character
-          if (in_value) {
-            // This should be the start of a number
-            let start = i;
-            while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
-              i++;
-            }
-            value = Number(this.s.substring(start,i));
-            if (this_choice == null) {
-              this_choice = new Choice ( name );
-            }
-            this_choice.value = value;
-            this.choices.push ( this_choice );
-            this_choice = null;
-            name = '';
-            value = null;
+      if (this.s.trim().length > 0) {
+
+        this.choices = [];
+        let in_value = false;
+        let in_equals = false;
+        let in_name = false;
+        let name = '';
+        let value = null;
+        let i = 0;
+        let this_choice = null;
+        while (i < this.s.length) {
+          if (' \n\t\r[]'.indexOf(this.s[i]) >= 0) {
+            // Found a space or insignificant character
+            i++;
+          } else if (this.s[i] == '(') {
+            // Found start of rank
+            in_value = true;
+            i++;
+          } else if (this.s[i] == ')') {
+            // Found end of rank
             in_value = false;
+            i++;
+          } else if (this.s[i] == '=') {
+            // Found an equals
+            in_equals = true;
+            i++;
           } else {
-            // This should be the start of a new name
-            if (this_choice != null) {
-              // Finish the old name
-              this_choice.requals = in_equals;
+            // Found some other character
+            if (in_value) {
+              // This should be the start of a number
+              let start = i;
+              while ( (i<this.s.length) && ('0123456789.'.indexOf(this.s[i]) >= 0) ) {
+                i++;
+              }
+              value = Number(this.s.substring(start,i));
+              if (this_choice == null) {
+                this_choice = new Choice ( name );
+              }
+              this_choice.value = value;
               this.choices.push ( this_choice );
               this_choice = null;
               name = '';
               value = null;
-            }
-            let start = i;
-            while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
-              i++;
-            }
-            name = this.s.substring(start,i);
-            this_choice = new Choice(name);
-            if (in_equals) {
-              this_choice.equals = true;
-              in_equals = false;
+              in_value = false;
+            } else {
+              // This should be the start of a new name
+              if (this_choice != null) {
+                // Finish the old name
+                this_choice.requals = in_equals;
+                this.choices.push ( this_choice );
+                this_choice = null;
+                name = '';
+                value = null;
+              }
+              let start = i;
+              while ( (i<this.s.length) && ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.indexOf(this.s[i]) >= 0) ) {
+                i++;
+              }
+              name = this.s.substring(start,i);
+              this_choice = new Choice(name);
+              if (in_equals) {
+                this_choice.equals = true;
+                in_equals = false;
+              }
             }
           }
         }
+        if (this_choice != null) {
+          this.choices.push ( this_choice );
+          this_choice = null;
+        }
+        this.adjust_ranks();
+        this.remove_duplicates();
+        this.adjust_ranks();
       }
-      if (this_choice != null) {
-        this.choices.push ( this_choice );
-        this_choice = null;
-      }
-      this.adjust_ranks();
-      this.remove_duplicates();
-      this.adjust_ranks();
     }
   }
 
@@ -516,6 +519,17 @@ class BallotBox {
         // Format 1: Ballots separated by newline, range values in []
         console.log ( "Ballots in format 1" );
         let blist = s.split('\n');
+        // Remove /, //, and # Comments:
+        for (let i=0; i<blist.length; i++) {
+          let comment_index = blist[i].indexOf('/');
+          if (comment_index >= 0) {
+            blist[i] = blist[i].substr(0,comment_index);
+          }
+          comment_index = blist[i].indexOf('#');
+          if (comment_index >= 0) {
+            blist[i] = blist[i].substr(0,comment_index);
+          }
+        }
         for (let i=0; i<blist.length; i++) {
           if (blist[i].trim().length > 0) {
             // this.add ( new Ballot ( blist[i].replace(']',' ').trim(), 1 ) );
@@ -1549,6 +1563,7 @@ D C=B A
 <li>Numeric scores may be entered inside brackets.<br/>
       &nbsp; <i>Ballot with numeric scores: <b>b[95] d[70] a[70] c[5]</b></i></li>
 <li>Voting methods may use ordering and scores differently.</li>
+<li>Comments may start with either # or /.</li>
 </ul>
 
 <br/>
