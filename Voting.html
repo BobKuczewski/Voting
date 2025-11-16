@@ -1039,11 +1039,14 @@ function load_example() {
 
   if (document.getElementById("example").value == "examples") {
     ballot_area.value =
-      "C B A=D\n" +
-      "A C B D\n" +
-      "B C A=D\n" +
-      "A=D C B\n" +
-      "D C=B A\n" ;
+      "A[8] B[6] C[3] D[1]\n" +
+      "B[9] A[4] D[1] C[0]\n" +
+      "B[8] A[5] D[3] C[1]\n" +
+      "B[8] D[7] A[2] C[0]\n" +
+      "C[9] A[5] B[4] D[0]\n" +
+      "C[7] A[4] B[2] D[2]\n" +
+      "D[9] A[3] B[2] C[1]\n" +
+      "D[8] A[4] B[3] C[2]\n" ;
 
   } else if (document.getElementById("example").value == "DRT_ordered_only") {
     ballot_area.value =
@@ -1431,11 +1434,14 @@ function load() {
 <td width="30%" valign="top" style="border: 0px;">
 Ballots:<br/>
 <textarea width="100%" id="ballots" rows="16" cols="32">
-C B A=D
-A C B D
-B C A=D
-A=D C B
-D C=B A
+A[8] B[6] C[3] D[1]
+B[9] A[4] D[1] C[0]
+B[8] A[5] D[3] C[1]
+B[8] D[7] A[2] C[0]
+C[9] A[5] B[4] D[0]
+C[7] A[4] B[2] D[2]
+D[9] A[3] B[2] C[1]
+D[8] A[4] B[3] C[2]
 </textarea>
 </td>
 
