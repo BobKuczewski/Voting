@@ -27,6 +27,9 @@
     padding-bottom: 2px;
     background: #eea;
   }
+  .results {
+    font-weight: normal;
+  }
 </style>
 
 </head>
@@ -519,9 +522,9 @@ function simple_plurality ( ballot_text, detail_level ) {
     }
   }
   if (highest_candidates.length == 1) {
-    result += "<b>The Simple Plurality Winner is: &nbsp; " + highest_candidates[0] + "</b><br/>\n";
+    result += "<b>The Simple Plurality Winner is: &nbsp; " + highest_candidates[0] + "</b>\n";
   } else if (highest_candidates.length > 1) {
-    result += "<b>The Simple Plurality Winners are: &nbsp; " + highest_candidates + "</b><br/>\n";
+    result += "<b>The Simple Plurality Winners are: &nbsp; " + highest_candidates + "</b>\n";
   } else {
     result += "No Candidates Found.";
   }
@@ -1010,7 +1013,19 @@ function calc_results ( detail_level ) {
   let ballot_text = ballot_area.value;
   let results = "";
 
-  if (document.getElementById("mode").value == "plurality_mode") {
+  if (document.getElementById("mode").value == "all_mode") {
+    results_plurality = simple_plurality ( ballot_text, detail_level );
+    results_range = range_voting ( ballot_text, detail_level );
+    results_ir = instant_runoff ( ballot_text, detail_level );
+    results_condorcet = condorcet ( ballot_text, detail_level );
+    results += "<table>\n";
+    results += "<tr><th> Results </th></tr>\n";
+    results += "<tr><td class=\"results\">" + results_plurality + "</td></tr>\n";
+    results += "<tr><td class=\"results\">" + results_range + "</td></tr>\n";
+    results += "<tr><td class=\"results\">" + results_ir + "</td></tr>\n";
+    results += "<tr><td class=\"results\">" + results_condorcet + "</td></tr>\n";
+    results += "</table>\n";
+  } else if (document.getElementById("mode").value == "plurality_mode") {
     results = simple_plurality ( ballot_text, detail_level );
   } else if (document.getElementById("mode").value == "range_mode") {
     results = range_voting ( ballot_text, detail_level );
@@ -1512,6 +1527,7 @@ D[8] A[4] B[3] C[2]
 </center>
 
 &nbsp; &nbsp; <select id="mode" onchange="change_methods()">
+<option value="all_mode">All</option>
 <option value="plurality_mode">Simple Plurality</option>
 <option value="range_mode">Range</option>
 <option value="instant_runoff_mode">Instant Runoff</option>
