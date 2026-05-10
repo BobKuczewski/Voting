@@ -351,7 +351,7 @@ class Ballot {
         pref = first;
       }
     }
-    console.log ( "Preference between " + a + " and " + b + " in: " + this.s + " is " + pref );
+    // console.log ( "Preference between " + a + " and " + b + " in: " + this.s + " is " + pref );
     return ( pref );
   }
 
@@ -623,8 +623,10 @@ function range_voting ( ballot_text, detail_level ) {
     result += "<b>The Range Winners are: &nbsp; " + winners + "</b>\n";
   }
 
-  if ( (found_one == false) || ((found_one == true) && (found_all == false)) ) {
-    result += "<b>&nbsp;(with some automatically generated scores)</b>";
+  if (found_one == false) {
+    result += "<b>&nbsp;(with <u>all</u> automatically generated scores)</b>";
+  } else if ( (found_one == true) && (found_all == false) ) {
+    result += "<b>&nbsp;(with <u>some</u> automatically generated scores)</b>";
   }
   result += "\n";
   return ( result );
