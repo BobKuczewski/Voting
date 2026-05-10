@@ -1060,6 +1060,7 @@ function change_methods() {
 }
 
 function change_example() {
+  load_example();
 }
 
 function load_example() {
@@ -1496,7 +1497,7 @@ D[8] A[4] B[3] C[2]
 
 <br/>
 
-&nbsp; &nbsp; <select id="example" onchange="change_example()">
+&nbsp; Load: &nbsp; <select id="example" onchange="change_example()">
 <option value="examples">Examples</option>
 <option value="consensus_1">Hidden Consensus 1</option>
 <option value="consensus_2">Hidden Consensus 2</option>
@@ -1522,7 +1523,7 @@ D[8] A[4] B[3] C[2]
 <option value="DRT_RangeExtreme">DRT (Range Extremes)</option>
 </select>
 
-<input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input>
+<!-- <input type="button" id="load_ex" value="Load Example" onclick="load_example()"></input> -->
 
 
 <!-- Notes for "new" style:
