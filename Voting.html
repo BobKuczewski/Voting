@@ -541,7 +541,7 @@ function range_voting ( ballot_text, detail_level ) {
     return ( "<b>No ballots or candidates.</b>" );
   }
 
-  let result = "<b>Range Voting &nbsp; </b> (uses sum of scores):<br/>\n";
+  let result = "<b>Range Voting &nbsp; </b> (uses sum of scores, generated as needed):<br/>\n";
 
   let machine = {};
   for (let i=0; i<bb.cand_list.length; i++) {
@@ -1177,17 +1177,22 @@ function load_example() {
 
   } else if (document.getElementById("example").value == "Ban_Scott") {
     ballot_area.value =
-      "Y[100] N[0]  // KK\n" +
-      "Y[100] N[0]  // JB\n" +
-      "Y[100] N[0]  // SG\n" +
-      "Y[100] N[0]  // Dan\n" +
-      "Y[100] N[50] // Jason\n" +
-      "N[100] Y[50] // HGXC\n" +
-      "N[1]   Y[0]  // Scare\n" +
-      "N[100] Y[1]  // HGAAflyer\n" +
-      "N[100] Y[1]  // PilotGuy\n" +
-      "N[100] Y[0]  // SkyPilot\n" +
-      "N[100] Y[0]  // Bob\n" ;
+      "// Real Example:\n" +
+      "//   Scott was banned\n" +
+      "//   due to Range Voting\n" +
+      "//   imposed by Jack\n" +
+      "\n" +
+      "Yes[100] No[0]  // KK\n" +
+      "Yes[100] No[0]  // JB\n" +
+      "Yes[100] No[0]  // SG\n" +
+      "Yes[100] No[0]  // Dan\n" +
+      "Yes[100] No[50] // Jason\n" +
+      "No[100] Yes[50] // HGXC\n" +
+      "No[1]   Yes[0]  // Scare\n" +
+      "No[100] Yes[1]  // HGAAflyer\n" +
+      "No[100] Yes[1]  // PilotGuy\n" +
+      "No[100] Yes[0]  // SkyPilot\n" +
+      "No[100] Yes[0]  // Bob\n" ;
 
   } else if (document.getElementById("example").value == "Java_Simple") {
     ballot_area.value =
@@ -1438,7 +1443,7 @@ function load() {
 
 </script>
 
-<body bgcolor="#D4E4FF" onload="load()">
+<body bgcolor="#C5E5F5" onload="load()">
 <center>
 <h2>Voting Methods Exploration</h2>
 
