@@ -400,7 +400,7 @@ class BallotBox {
           }
         }
       } else {
-        // Format 2: Ballots enclosed in [], range values in ()
+        // Format 2: Ballots enclosed in [], range values in (), no comments
         let blist = s.split('[');
         for (let i=0; i<blist.length; i++) {
           if (blist[i].length > 0) {
@@ -618,11 +618,15 @@ function range_voting ( ballot_text, detail_level ) {
   }
 
   if (winners.length <= 1) {
-    result += "<b>The Range Winner is: &nbsp; " + winners + "</b>\n";
+    result += "<b>The Range Winner is: &nbsp; " + winners + "</b>";
   } else {
     result += "<b>The Range Winners are: &nbsp; " + winners + "</b>\n";
   }
 
+  if ( (found_one == false) || ((found_one == true) && (found_all == false)) ) {
+    result += "<b>&nbsp;(with some automatically generated scores)</b>";
+  }
+  result += "\n";
   return ( result );
 }
 
