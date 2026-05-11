@@ -30,6 +30,10 @@
   .results {
     font-weight: normal;
   }
+  .ballots {
+    font-weight: normal;
+    border: none;
+  }
 </style>
 
 </head>
@@ -1058,6 +1062,371 @@ function calc_results ( detail_level ) {
 
 }
 
+
+function show_help() {
+  h = "";
+  h += "<p>";
+  h += "<b>Description:</b>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "This web page supports exploration of several different voting systems. These systems currently include:"
+  h += "<ul>"
+  h += "<li>Simple Plurality</li>"
+  h += "<li>Range</li>"
+  h += "<li>Instant Runoff</li>"
+  h += "<li>Condorcet</li>"
+  h += "</ul>"
+  h += "</p>";
+
+  h += "<p>";
+  h += "This page allows entering and editing ballots, selecting examples, and calculating results."
+  h += "</p>";
+
+  h += "<p>";
+  h += "<b>Ballots:</b>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "Each ballot is represented by a single line of text. In other words, each line of text"
+       + " represents a different ballot cast by a different voter. So 7 ballots cast by 7 voters"
+       + " will be represented by 7 lines of text. Here's an example of 7 such ballots with candidates"
+       + " represented by the letters <b>A</b>, <b>B</b>, <b>C</b>, <b>D</b>:"
+  h += "</p>";
+
+  h += "<p style=\"padding-left: 20px;\">";
+  h += "A C B D<br/>";
+  h += "B A C D<br/>";
+  h += "B A D C<br/>";
+  h += "C B D A<br/>";
+  h += "C A B D<br/>";
+  h += "D A C B<br/>";
+  h += "D A B C<br/>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "Within each ballot (each line of text), the candidates are listed with the most favored choice"
+       + " first in the list. So if the three candidates were Al, Betty, and Carl, then a voter who"
+       + " preferred Betty first, and Carl second, and Al last would mark their ballot as:";
+  h += "</p>";
+
+  h += "<p>&nbsp;&nbsp;&nbsp;Betty Carl Al</p>";
+  h += "<p>A series of such ballots (cast by different voters) might be:</p>";
+
+/*
+  h += "<table class=\"ballots\" style=\"padding-left: 10px;\">";
+  h += "<tr><td class=\"ballots\">Betty</td><td class=\"ballots\">Carl</td><td class=\"ballots\">Al</td></tr>";
+  h += "<tr><td class=\"ballots\">Al</td><td class=\"ballots\">Carl</td><td class=\"ballots\">Betty</td></tr>";
+  h += "<tr><td class=\"ballots\">Carl</td><td class=\"ballots\">Al</td><td class=\"ballots\">Betty</td></tr>";
+  h += "<tr><td class=\"ballots\">Betty</td><td class=\"ballots\">Carl</td><td class=\"ballots\">Al</td></tr>";
+  h += "<tr><td class=\"ballots\">Al</td><td class=\"ballots\">Betty</td><td class=\"ballots\">Carl</td></tr>";
+  h += "<tr><td class=\"ballots\">Carl</td><td class=\"ballots\">Betty</td><td class=\"ballots\">Al</td></tr>";
+  h += "<tr><td class=\"ballots\">Carl</td><td class=\"ballots\">Al</td><td class=\"ballots\">Betty</td></tr>";
+  h += "</table>";
+*/
+
+  h += "<p style=\"padding-left: 20px;\">";
+  h += "Betty &nbsp; Carl &nbsp; Al<br/>";
+  h += "Al &nbsp; Carl &nbsp; Betty<br/>";
+  h += "Carl &nbsp; Al &nbsp; Betty<br/>";
+  h += "Betty &nbsp; Carl &nbsp; Al<br/>";
+  h += "Al &nbsp; Betty &nbsp; Carl<br/>";
+  h += "Carl &nbsp; Betty &nbsp; Al<br/>";
+  h += "Carl &nbsp; Al &nbsp; Betty<br/>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "All of these examples allow a voter to express their preference of which candidates they prefer" +
+       " over which other candidates. These types of ballots are called \"<b>Ranked Choice Ballots</b>\" because" +
+       " each ballot represents a voter's preference or ranking of all (or some) of the candidates.";
+  h += "</p>";
+
+  h += "<p>";
+  h += "In addition to expressing simple preferences among candidates, some voting systems allow voters" +
+       " to score the candidates over some range (typically 0 to 100). So a list of ballots with range scores might" +
+       " look something like this:";
+  h += "</p>";
+
+  h += "<p style=\"padding-left: 20px;\">";
+  h += "Betty[90] &nbsp;&nbsp; Carl[80] &nbsp;&nbsp; Al[10]<br/>";
+  h += "Al[80] &nbsp;&nbsp; Carl[70] &nbsp;&nbsp; Betty[40]<br/>";
+  h += "Carl[100] &nbsp;&nbsp; Al[0] &nbsp;&nbsp; Betty[0]<br/>";
+  h += "Betty[55] &nbsp;&nbsp; Carl[50] &nbsp;&nbsp; Al[45]<br/>";
+  h += "Al[99] &nbsp;&nbsp; Betty[98] &nbsp;&nbsp; Carl[0]<br/>";
+  h += "Carl[0] &nbsp;&nbsp; Betty[0] &nbsp;&nbsp; Al[0]<br/>";
+  h += "Carl[100] &nbsp;&nbsp; Al[70] &nbsp;&nbsp; Betty[20]<br/>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "Note that when range scores are used, the candidates in each ballot should still" +
+       " be listed in the order of preference (largest scores first) to ensure proper scoring.";
+  h += "</p>";
+
+  h += "<p>";
+  h += "<b>Results:</b>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "Once the ballots are entered, the results can be calculated by pressing either the" +
+       " \"<b>Calculate Results</b>\" button or the \"<b>Calculate Detailed Results</b>\" button." +
+       " They both produce the same results, but as their name suggests, the detailed version" +
+       " shows much more detail about how each voting method produced its results."
+  h += "</p>";
+
+  h += "<p>";
+  h += "<b>Example:</b>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "Let's start with a simple example using 4 candidates (A,B,C,D) and 7 voters. Imagine that each of 7" +
+       " voters cast a ballot ranking the candidates by order of preference and with a score from 0 to 9." +
+       " Here are those ballots:";
+  h += "</p>";
+
+  h += "<p style=\"padding-left: 20px;\">";
+  h += "A[9] &nbsp; B[4] &nbsp; C[3] &nbsp; D[2]<br/>";
+  h += "B[9] &nbsp; A[4] &nbsp; D[3] &nbsp; C[2]<br/>";
+  h += "B[9] &nbsp; A[4] &nbsp; D[3] &nbsp; C[2]<br/>";
+  h += "C[9] &nbsp; A[4] &nbsp; B[3] &nbsp; D[2]<br/>";
+  h += "C[9] &nbsp; A[4] &nbsp; B[3] &nbsp; D[2]<br/>";
+  h += "D[9] &nbsp; A[4] &nbsp; B[3] &nbsp; C[2]<br/>";
+  h += "D[9] &nbsp; A[4] &nbsp; B[3] &nbsp; C[2]<br/>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "You can type these ballots into the ballot window or copy and paste them there. You can also select" +
+       " and load the \"Hidden Consensus 1\" example to load those same ballots. Either" +
+       " method will give the same results. When you click on the \"<b>Calculate Results</b>\" button," +
+       " you should get the following results:";
+  h += "</p>";
+
+  h += "<div style=\"padding-left: 20px;\"><table>" +
+       "<tbody><tr><th> Results </th></tr>" +
+       "<tr><td class=\"results\"><b>Simple Plurality &nbsp; </b> (only first choice matters, equals and scores ignored):<br>" +
+       "<b>The Simple Plurality Winners are: &nbsp; B,C,D</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Range Voting &nbsp; </b> (uses sum of scores, generated as needed):<br>" +
+       "<b>The Range Winner is: &nbsp; B</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Instant Runoff Voting &nbsp; </b> (evaluate and replace, equals and scores ignored):<br>" +
+       "<b>The Instant Runoff Winner is: &nbsp; B</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Condorcet Voting &nbsp; </b> (winner must defeat all others, scores ignored):<br>" +
+       "<b>The Condorcet Winner is: &nbsp; A" +
+       "</b></td></tr>" +
+       "</tbody></table></div>";
+
+  h += "<p>";
+  h += "As you can see, different voting systems can produce different winners from the same set of ballots.";
+  h += "</p>";
+
+  h += "<p>";
+  h += "If you click on the \"<b>Calculate Detailed Results</b>\" button," +
+       " you will get more explanation on how each result was calculated:";
+  h += "</p>";
+
+  h += "<div style=\"padding-left: 20px;\"><table>" +
+       "<tbody><tr><th> Results </th></tr>" +
+       "<tr><td class=\"results\"><b>Simple Plurality &nbsp; </b> (only first choice matters, equals and scores ignored):<br>" +
+       "Total votes cast: <b>7</b><br>" +
+       "Candidate <b>A</b> got 1 first choice votes<br>" +
+       "Candidate <b>B</b> got 2 first choice votes<br>" +
+       "Candidate <b>C</b> got 2 first choice votes<br>" +
+       "Candidate <b>D</b> got 2 first choice votes<br>" +
+       "<b>The Simple Plurality Winners are: &nbsp; B,C,D</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Range Voting &nbsp; </b> (uses sum of scores, generated as needed):<br>" +
+       "Candidate <b>A</b> got a total of 33 range points<br>" +
+       "Candidate <b>B</b> got a total of 34 range points<br>" +
+       "Candidate <b>C</b> got a total of 29 range points<br>" +
+       "Candidate <b>D</b> got a total of 30 range points<br>" +
+       "<b>The Range Winner is: &nbsp; B</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Instant Runoff Voting &nbsp; </b> (evaluate and replace, equals and scores ignored):<br>" +
+       "&nbsp; Round 1<br>&nbsp; &nbsp; &nbsp; A,B,C,D<br>" +
+       "&nbsp; &nbsp; &nbsp; B,A,D,C<br>" +
+       "&nbsp; &nbsp; &nbsp; B,A,D,C<br>" +
+       "&nbsp; &nbsp; &nbsp; C,A,B,D<br>" +
+       "&nbsp; &nbsp; &nbsp; C,A,B,D<br>" +
+       "&nbsp; &nbsp; &nbsp; D,A,B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; D,A,B,C<br>" +
+       "&nbsp; &nbsp; Eliminating <b>A</b> (fewest first choice votes)<br>&nbsp; Round 2<br>&nbsp; &nbsp; &nbsp; B,C,D<br>" +
+       "&nbsp; &nbsp; &nbsp; B,D,C<br>" +
+       "&nbsp; &nbsp; &nbsp; B,D,C<br>" +
+       "&nbsp; &nbsp; &nbsp; C,B,D<br>" +
+       "&nbsp; &nbsp; &nbsp; C,B,D<br>" +
+       "&nbsp; &nbsp; &nbsp; D,B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; D,B,C<br>" +
+       "&nbsp; &nbsp; Eliminating <b>D</b> (chosen at random among those with fewest first choice votes)<br>&nbsp; Round 3<br>&nbsp; &nbsp; &nbsp; B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; C,B<br>" +
+       "&nbsp; &nbsp; &nbsp; C,B<br>" +
+       "&nbsp; &nbsp; &nbsp; B,C<br>" +
+       "&nbsp; &nbsp; &nbsp; B,C<br>" +
+       "&nbsp; &nbsp; Majority Winner: <b>B</b> had 5 first choice votes.<br><b>The Instant Runoff Winner is: &nbsp; B</b>" +
+       "</td></tr>" +
+       "<tr><td class=\"results\"><b>Condorcet Voting &nbsp; </b> (winner must defeat all others, scores ignored):<br>" +
+       "<b>The Condorcet Winner is: &nbsp; A" +
+       "<hr>" +
+       "<table style=\"border: 0px;\" width=\"100%\">" +
+       "<tbody><tr style=\"border: 0px;\">" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<table>" +
+       "<tbody><tr>" +
+       "<th><center>\\</center></th>" +
+       "<th><center>A</center></th>" +
+       "<th><center>B</center></th>" +
+       "<th><center>C</center></th>" +
+       "<th><center>D</center></th>" +
+       "</tr>" +
+       "<tr>" +
+       "<th><center>A</center></th>" +
+       "<td><center>\\</center></td>" +
+       "<td><center>5</center></td>" +
+       "<td><center>5</center></td>" +
+       "<td><center>5</center></td>" +
+       "</tr>" +
+       "<tr>" +
+       "<th><center>B</center></th>" +
+       "<td><center>2</center></td>" +
+       "<td><center>\\</center></td>" +
+       "<td><center>5</center></td>" +
+       "<td><center>5</center></td>" +
+       "</tr>" +
+       "<tr>" +
+       "<th><center>C</center></th>" +
+       "<td><center>2</center></td>" +
+       "<td><center>2</center></td>" +
+       "<td><center>\\</center></td>" +
+       "<td><center>3</center></td>" +
+       "</tr>" +
+       "<tr>" +
+       "<th><center>D</center></th>" +
+       "<td><center>2</center></td>" +
+       "<td><center>2</center></td>" +
+       "<td><center>4</center></td>" +
+       "<td><center>\\</center></td>" +
+       "</tr>" +
+       "</tbody></table>" +
+       "</td>" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<p>" +
+       "Result Tables" +
+       "</p>" +
+       "<p>" +
+       "The table to the left shows the win/loss counts for each pair " +
+       "of candidates. If there is a Condorcet Winner, then there will" +
+       "also be a series of tables below. These tables (below) will show how " +
+       "each ballot contributed to the winner defeating every other candidate" +
+       "in the election." +
+       "</p>" +
+       "</td>" +
+       "</tr>" +
+       "</tbody></table>" +
+       "<hr>" +
+       "<table style=\"border: 0px;\" width=\"100%\">" +
+       "<tbody><tr style=\"border: 0px;\">" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<table>" +
+       "<tbody><tr><th colspan=\"4\"><b>Ballots</b></th></tr>" +
+       "<tr>" +
+       "<td>A</td>" +
+       "<td>B</td>" +
+       "<td>C</td>" +
+       "<td>D</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>B</td>" +
+       "<td>A</td>" +
+       "<td>D</td>" +
+       "<td>C</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>B</td>" +
+       "<td>A</td>" +
+       "<td>D</td>" +
+       "<td>C</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>C</td>" +
+       "<td>A</td>" +
+       "<td>B</td>" +
+       "<td>D</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>C</td>" +
+       "<td>A</td>" +
+       "<td>B</td>" +
+       "<td>D</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>D</td>" +
+       "<td>A</td>" +
+       "<td>B</td>" +
+       "<td>C</td>" +
+       "</tr>" +
+       "<tr>" +
+       "<td>D</td>" +
+       "<td>A</td>" +
+       "<td>B</td>" +
+       "<td>C</td>" +
+       "</tr>" +
+       "</tbody></table>" +
+       "</td>" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<table>" +
+       "<tbody><tr><th colspan=\"2\"><b>A v B</b></th></tr>" +
+       "<tr><td>A</td><td>B</td></tr>" +
+       "<tr><td>B</td><td>A</td></tr>" +
+       "<tr><td>B</td><td>A</td></tr>" +
+       "<tr><td>A</td><td>B</td></tr>" +
+       "<tr><td>A</td><td>B</td></tr>" +
+       "<tr><td>A</td><td>B</td></tr>" +
+       "<tr><td>A</td><td>B</td></tr>" +
+       "</tbody></table>" +
+       "<p>A vs B:<br> 5 to 2</p></td>" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<table>" +
+       "<tbody><tr><th colspan=\"2\"><b>A v C</b></th></tr>" +
+       "<tr><td>A</td><td>C</td></tr>" +
+       "<tr><td>A</td><td>C</td></tr>" +
+       "<tr><td>A</td><td>C</td></tr>" +
+       "<tr><td>C</td><td>A</td></tr>" +
+       "<tr><td>C</td><td>A</td></tr>" +
+       "<tr><td>A</td><td>C</td></tr>" +
+       "<tr><td>A</td><td>C</td></tr>" +
+       "</tbody></table>" +
+       "<p>A vs C:<br> 5 to 2</p></td>" +
+       "<td style=\"border: 0px;\" valign=\"top\">" +
+       "<table>" +
+       "<tbody><tr><th colspan=\"2\"><b>A v D</b></th></tr>" +
+       "<tr><td>A</td><td>D</td></tr>" +
+       "<tr><td>A</td><td>D</td></tr>" +
+       "<tr><td>A</td><td>D</td></tr>" +
+       "<tr><td>A</td><td>D</td></tr>" +
+       "<tr><td>A</td><td>D</td></tr>" +
+       "<tr><td>D</td><td>A</td></tr>" +
+       "<tr><td>D</td><td>A</td></tr>" +
+       "</tbody></table>" +
+       "<p>A vs D:<br> 5 to 2</p></td>" +
+       "</tr>" +
+       "</tbody></table>" +
+       "</b></td></tr></tbody></table>";
+
+  h += "<p>";
+  h += "<b>Conclusion:</b>";
+  h += "</p>";
+
+  h += "<p>";
+  h += "This program allows experimentation with different voting systems and with different sets of ballots." +
+       " It also offers some explanation as to how the results are calculated from any given set of ballats.";
+  h += "</p>";
+
+
+  document.getElementById ( "results" ).innerHTML = h;
+}
+
 function change_methods() {
 }
 
@@ -1156,13 +1525,13 @@ function load_example() {
 
   } else if (document.getElementById("example").value == "consensus_1") {
     ballot_area.value =
-      "A[9] B[4] C[3] D[2]\n" +
-      "B[9] A[4] D[3] C[2]\n" +
-      "B[9] A[4] D[3] C[2]\n" +
-      "C[9] A[4] B[3] D[2]\n" +
-      "C[9] A[4] B[3] D[2]\n" +
-      "D[9] A[4] B[3] C[2]\n" +
-      "D[9] A[4] B[3] C[2]\n" ;
+      "A[9]   B[4]   C[3]   D[2]\n" +
+      "B[9]   A[4]   D[3]   C[2]\n" +
+      "B[9]   A[4]   D[3]   C[2]\n" +
+      "C[9]   A[4]   B[3]   D[2]\n" +
+      "C[9]   A[4]   B[3]   D[2]\n" +
+      "D[9]   A[4]   B[3]   C[2]\n" +
+      "D[9]   A[4]   B[3]   C[2]\n" ;
 
   } else if (document.getElementById("example").value == "consensus_2") {
     ballot_area.value =
@@ -1556,8 +1925,9 @@ D[8] A[4] B[3] C[2]
 <option value="condorcet_mode">Condorcet</option>
 </select>
 
-&nbsp; <input type="button" name="ref_model" value="Calculate Results" onclick="calc_results(0)"></input>
-&nbsp; <input type="button" name="ref_model" value="Calculate Detailed Results" onclick="calc_results(5)"></input>
+&nbsp; <input type="button" name="results0" value="Calculate Results" onclick="calc_results(0)"></input>
+&nbsp; <input type="button" name="results5" value="Calculate Detailed Results" onclick="calc_results(5)"></input>
+&nbsp; &nbsp; &nbsp; <input type="button" name="help" value="Help" onclick="show_help()"></input>
 <hr/>
 
 <p id="results"></p>
